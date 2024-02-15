@@ -15,6 +15,9 @@ doc/api/
 *.sqlite
 db/
 
+# Codegen
+*.g.dart
+
 # dotenv environment variables file
 .env*
 
