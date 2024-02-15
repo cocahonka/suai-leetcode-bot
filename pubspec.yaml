@@ -1,0 +1,16 @@
+name: suai_leetcode_bot
+version: 0.0.1
+repository: https://github.com/cocahonka/suai-leetcode-bot
+
+environment:
+  sdk: ^3.2.6
+
+dependencies:
+  drift: ^2.15.0
+  path: ^1.8.0
+  sqlite3: ^2.4.0
+
+dev_dependencies:
+  build_runner: ^2.4.8
+  drift_dev: ^2.15.0
+  very_good_analysis: ^5.1.0
