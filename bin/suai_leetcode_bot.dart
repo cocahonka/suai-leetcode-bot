@@ -4,14 +4,19 @@ import 'dart:io';
 
 import 'package:path/path.dart' as path;
 import 'package:sqlite3/open.dart' as sqlite;
+import 'package:suai_leetcode_bot/bot/telegram_bot.dart';
 import 'package:suai_leetcode_bot/config/config.dart';
+import 'package:suai_leetcode_bot/database/database.dart';
 
-Future<void> main() async {
+void main() {
   sqlite.open
     ..overrideFor(sqlite.OperatingSystem.linux, _openOnLinux)
     ..overrideFor(sqlite.OperatingSystem.windows, _openOnWindows);
 
+  final database = AppDatabase();
   final config = _readConfig();
+
+  TelegramBot(config: config, database: database).start();
 }
 
 Config _readConfig() {
