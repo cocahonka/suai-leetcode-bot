@@ -6,7 +6,6 @@ import 'package:suai_leetcode_bot/bot/scopes/telegram_scope.dart';
 import 'package:suai_leetcode_bot/database/database.dart';
 import 'package:televerse/televerse.dart';
 
-// TODO(cocahonka): Refactor.
 final class RegisterScope extends TelegramScope<RegisterState> {
   RegisterScope({
     required AppDatabase database,
@@ -16,7 +15,7 @@ final class RegisterScope extends TelegramScope<RegisterState> {
   final AppDatabase _database;
 
   @override
-  String get name => 'Register scope';
+  String get debugName => 'Register scope';
 
   @override
   bool predicate(Context<Session> context) {
@@ -33,86 +32,98 @@ final class RegisterScope extends TelegramScope<RegisterState> {
   FutureOr<void> callback(Context<Session> context) async {
     final chatId = context.chat!.id;
     final state = repository.getState(chatId: chatId);
-    switch (state) {
-      case RegisterInitial():
-        await _requestName(context, chatId);
-      case RegisterWaitingForName():
-        await _takeName(context, chatId);
-      case RegisterWaitingForGroupNumber(name: final name):
-        await _takeGroupNumber(context, chatId, name);
-      case RegisterWaitingForLeetCodeNickname(name: final name, groupNumber: final groupNumber):
-        await _takeLeetCodeNickname(context, chatId, name, groupNumber);
-      case RegisterCompleted():
-    }
+
+    await switch (state) {
+      RegisterInitial() => _requestName(context, chatId, state),
+      RegisterWaitingForName() => _takeName(context, chatId, state),
+      RegisterWaitingForGroupNumber() => _takeGroupNumber(context, chatId, state),
+      RegisterWaitingForLeetCodeNickname() => _takeLeetCodeNickname(context, chatId, state),
+      RegisterCompleted() => Future<void>.value(),
+    };
   }
 
-  Future<void> _requestName(Context<Session> context, int chatId) async {
+  Future<void> _requestName(
+    Context<Session> context,
+    int chatId,
+    RegisterInitial state,
+  ) async {
     await context.reply('Введите ваше реальное имя');
 
-    repository.setState(chatId: chatId, state: const RegisterWaitingForName());
+    repository.setState(
+      chatId: chatId,
+      state: const RegisterWaitingForName(),
+    );
   }
 
-  Future<void> _takeName(Context<Session> context, int chatId) async {
-    final enteredName = context.message!.text?.trim();
+  Future<void> _takeName(
+    Context<Session> context,
+    int chatId,
+    RegisterWaitingForName state,
+  ) async {
+    final name = context.message!.text?.trim();
     final validateRegex = RegExp(r'^[а-яА-ЯёЁ]{2,32}$');
 
-    if (enteredName == null || !validateRegex.hasMatch(enteredName)) {
+    if (name == null || !validateRegex.hasMatch(name)) {
       await context.reply('Имя должно быть без пробелов и на русском языке, введите еще раз');
       return;
     }
 
-    await _requestGroupNumber(context, chatId, enteredName);
-  }
-
-  Future<void> _requestGroupNumber(Context<Session> context, int chatId, String name) async {
     await context.reply('Введите номер группы');
 
-    repository.setState(chatId: chatId, state: RegisterWaitingForGroupNumber(name: name));
+    repository.setState(
+      chatId: chatId,
+      state: RegisterWaitingForGroupNumber(name: name),
+    );
   }
 
-  Future<void> _takeGroupNumber(Context<Session> context, int chatId, String name) async {
-    final enteredGroupNumber = context.message!.text?.trim();
+  Future<void> _takeGroupNumber(
+    Context<Session> context,
+    int chatId,
+    RegisterWaitingForGroupNumber state,
+  ) async {
+    final groupNumber = context.message!.text?.trim();
 
     // TODO(cocahonka): Validate group number.
-    if (enteredGroupNumber == null) {
+    if (groupNumber == null) {
       await context.reply('Неверный номер группы');
       return;
     }
 
-    await _requestLeetCodeNickname(context, chatId, name, enteredGroupNumber);
-  }
-
-  Future<void> _requestLeetCodeNickname(Context<Session> context, int chatId, String name, String groupNumber) async {
     await context.reply('Введите никнейм литкода');
 
     repository.setState(
       chatId: chatId,
-      state: RegisterWaitingForLeetCodeNickname(
-        name: name,
-        groupNumber: groupNumber,
-      ),
+      state: RegisterWaitingForLeetCodeNickname(name: state.name, groupNumber: groupNumber),
     );
   }
 
-  Future<void> _takeLeetCodeNickname(Context<Session> context, int chatId, String name, String groupNumber) async {
-    final enteredLeetCodeNickname = context.message!.text?.trim();
+  Future<void> _takeLeetCodeNickname(
+    Context<Session> context,
+    int chatId,
+    RegisterWaitingForLeetCodeNickname state,
+  ) async {
+    final leetCodeNickname = context.message!.text?.trim();
 
     // TODO(cocahonka): Validate leetcode nickname.
-    if (enteredLeetCodeNickname == null) {
+    if (leetCodeNickname == null) {
       await context.reply('Неверный никнейм');
       return;
     }
 
-    await _createUser(chatId, name, groupNumber, enteredLeetCodeNickname);
+    await _createUser(chatId, state, leetCodeNickname);
   }
 
-  Future<void> _createUser(int chatId, String name, String groupNumber, String leetCodeNickname) async {
+  Future<void> _createUser(
+    int chatId,
+    RegisterWaitingForLeetCodeNickname state,
+    String leetCodeNickname,
+  ) async {
     await _database.transaction<void>(() async {
       final userId = await _database.into(_database.users).insert(
             UsersCompanion.insert(
               telegramId: chatId,
-              name: Value(name),
-              groupNumber: Value(groupNumber),
+              name: Value(state.name),
+              groupNumber: Value(state.groupNumber),
             ),
           );
       await _database.into(_database.leetCodeAccounts).insert(
@@ -123,6 +134,9 @@ final class RegisterScope extends TelegramScope<RegisterState> {
           );
     });
 
-    repository.setState(chatId: chatId, state: const RegisterCompleted());
+    repository.setState(
+      chatId: chatId,
+      state: const RegisterCompleted(),
+    );
   }
 }

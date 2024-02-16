@@ -6,7 +6,7 @@ import 'package:televerse/televerse.dart';
 abstract base class TelegramScope<State> {
   const TelegramScope({required this.repository});
 
-  abstract final String name;
+  abstract final String debugName;
   final TelegramStateRepository<State> repository;
 
   bool predicate(Context<Session> context);
