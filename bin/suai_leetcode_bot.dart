@@ -12,12 +12,14 @@ Future<void> main() async {
 
 DynamicLibrary _openOnLinux() {
   final scriptFolderPath = File(Platform.script.toFilePath()).parent.path;
-  final libraryNextToScript = path.join(scriptFolderPath, 'sqlite3.so');
-  return DynamicLibrary.open(libraryNextToScript);
+  final libsFolderPath = path.join(scriptFolderPath, 'libs');
+  final libraryNextToDatabase = path.join(libsFolderPath, 'sqlite3.so');
+  return DynamicLibrary.open(libraryNextToDatabase);
 }
 
 DynamicLibrary _openOnWindows() {
   final scriptFolderPath = File(Platform.script.toFilePath()).parent.path;
-  final libraryNextToScript = path.join(scriptFolderPath, 'sqlite3.dll');
-  return DynamicLibrary.open(libraryNextToScript);
+  final libsFolderPath = path.join(scriptFolderPath, 'libs');
+  final libraryNextToDatabase = path.join(libsFolderPath, 'sqlite3.dll');
+  return DynamicLibrary.open(libraryNextToDatabase);
 }
