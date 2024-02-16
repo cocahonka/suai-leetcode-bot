@@ -110,13 +110,21 @@ final class RegisterScope extends TelegramScope<RegisterState> {
       return;
     }
 
-    await _createUser(chatId, state, leetCodeNickname);
+    final newState = RegisterCompleted(
+      name: state.name,
+      groupNumber: state.groupNumber,
+      leetCodeNickname: leetCodeNickname,
+    );
+
+    await _createUser(chatId, newState);
+    await context.reply('Аккаунт успешно создан! $newState');
+
+    repository.setState(chatId: chatId, state: newState);
   }
 
   Future<void> _createUser(
     int chatId,
-    RegisterWaitingForLeetCodeNickname state,
-    String leetCodeNickname,
+    RegisterCompleted state,
   ) async {
     await _database.transaction<void>(() async {
       final userId = await _database.into(_database.users).insert(
@@ -129,14 +137,9 @@ final class RegisterScope extends TelegramScope<RegisterState> {
       await _database.into(_database.leetCodeAccounts).insert(
             LeetCodeAccountsCompanion.insert(
               user: userId,
-              nickname: leetCodeNickname,
+              nickname: state.leetCodeNickname,
             ),
           );
     });
-
-    repository.setState(
-      chatId: chatId,
-      state: const RegisterCompleted(),
-    );
   }
 }
