@@ -10,10 +10,10 @@ part 'database.g.dart';
 class Users extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get telegramId => integer().unique()();
-  BoolColumn get isAdmin => boolean()();
+  BoolColumn get isAdmin => boolean().withDefault(const Constant(false))();
 
   TextColumn get name => text().nullable().withLength(min: 2, max: 32)();
-  IntColumn get groupNumber => integer().nullable()();
+  TextColumn get groupNumber => text().nullable()();
 }
 
 class LeetCodeAccounts extends Table {
