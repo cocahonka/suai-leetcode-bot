@@ -93,4 +93,27 @@ class AppDatabase extends _$AppDatabase {
       },
     );
   }
+
+  Future<void> createUserWithLeetCodeAccount({
+    required int telegramId,
+    required String name,
+    required String groupNumber,
+    required String leetCodeNickname,
+  }) async {
+    await transaction<void>(() async {
+      final userId = await into(users).insert(
+        UsersCompanion.insert(
+          telegramId: telegramId,
+          name: Value(name),
+          groupNumber: Value(groupNumber),
+        ),
+      );
+      await into(leetCodeAccounts).insert(
+        LeetCodeAccountsCompanion.insert(
+          user: userId,
+          nickname: leetCodeNickname,
+        ),
+      );
+    });
+  }
 }

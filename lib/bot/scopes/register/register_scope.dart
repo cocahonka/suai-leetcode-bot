@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:drift/drift.dart';
 import 'package:suai_leetcode_bot/bot/scopes/register/register_state.dart';
 import 'package:suai_leetcode_bot/bot/scopes/telegram_scope.dart';
 import 'package:suai_leetcode_bot/database/database.dart';
@@ -110,36 +109,14 @@ final class RegisterScope extends TelegramScope<RegisterState> {
       return;
     }
 
-    final newState = RegisterCompleted(
+    await _database.createUserWithLeetCodeAccount(
+      telegramId: chatId,
       name: state.name,
       groupNumber: state.groupNumber,
       leetCodeNickname: leetCodeNickname,
     );
+    await context.reply('Аккаунт успешно создан!');
 
-    await _createUser(chatId, newState);
-    await context.reply('Аккаунт успешно создан! $newState');
-
-    repository.setState(chatId: chatId, state: newState);
-  }
-
-  Future<void> _createUser(
-    int chatId,
-    RegisterCompleted state,
-  ) async {
-    await _database.transaction<void>(() async {
-      final userId = await _database.into(_database.users).insert(
-            UsersCompanion.insert(
-              telegramId: chatId,
-              name: Value(state.name),
-              groupNumber: Value(state.groupNumber),
-            ),
-          );
-      await _database.into(_database.leetCodeAccounts).insert(
-            LeetCodeAccountsCompanion.insert(
-              user: userId,
-              nickname: state.leetCodeNickname,
-            ),
-          );
-    });
+    repository.setState(chatId: chatId, state: const RegisterCompleted());
   }
 }

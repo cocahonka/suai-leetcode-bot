@@ -27,13 +27,5 @@ class RegisterWaitingForLeetCodeNickname extends RegisterState {
 }
 
 class RegisterCompleted extends RegisterState {
-  const RegisterCompleted({
-    required this.name,
-    required this.groupNumber,
-    required this.leetCodeNickname,
-  });
-
-  final String name;
-  final String groupNumber;
-  final String leetCodeNickname;
+  const RegisterCompleted();
 }
