@@ -103,6 +103,8 @@ class AppDatabase extends _$AppDatabase {
     return leetCodeAccount != null;
   }
 
+  Future<List<User>> get authorizedUsers => select(users).get();
+
   Future<void> createUserWithLeetCodeAccount({
     required int telegramId,
     required String name,

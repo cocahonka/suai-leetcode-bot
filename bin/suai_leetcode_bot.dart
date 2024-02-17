@@ -14,7 +14,7 @@ import 'package:suai_leetcode_bot/data/api/leetcode_api.dart';
 import 'package:suai_leetcode_bot/data/database/database.dart';
 import 'package:suai_leetcode_bot/data/repositories/leetcode_repository.dart';
 
-void main() {
+void main() async {
   sqlite.open
     ..overrideFor(sqlite.OperatingSystem.linux, _openOnLinux)
     ..overrideFor(sqlite.OperatingSystem.windows, _openOnWindows);
@@ -28,10 +28,15 @@ void main() {
     client: httpClient,
   );
 
+  final registerRepository = RuntimeRepository<RegisterState>(initialState: const RegisterInitial());
+  for (final User(:telegramId) in await database.authorizedUsers) {
+    registerRepository.setState(chatId: telegramId, state: const RegisterCompleted());
+  }
+
   final scopes = [
     RegisterScope(
       database: database,
-      repository: RuntimeRepository(initialState: const RegisterInitial()),
+      repository: registerRepository,
       leetCodeRepository: leetCodeRepository,
     ),
   ];
