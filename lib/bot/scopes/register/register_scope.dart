@@ -4,15 +4,19 @@ import 'package:suai_leetcode_bot/bot/scopes/register/register_state.dart';
 import 'package:suai_leetcode_bot/bot/scopes/telegram_scope.dart';
 import 'package:suai_leetcode_bot/constants/group_numbers.dart';
 import 'package:suai_leetcode_bot/data/database/database.dart';
+import 'package:suai_leetcode_bot/data/repositories/leetcode_repository.dart';
 import 'package:televerse/televerse.dart';
 
 final class RegisterScope extends TelegramScope<RegisterState> {
   RegisterScope({
     required AppDatabase database,
+    required HttpLeetCodeRepository leetCodeRepository,
     required super.repository,
-  }) : _database = database;
+  })  : _database = database,
+        _leetCodeRepository = leetCodeRepository;
 
   final AppDatabase _database;
+  final HttpLeetCodeRepository _leetCodeRepository;
 
   @override
   String get debugName => 'Register scope';
@@ -103,9 +107,15 @@ final class RegisterScope extends TelegramScope<RegisterState> {
   ) async {
     final leetCodeNickname = context.message!.text?.trim();
 
-    // TODO(cocahonka): Validate leetcode nickname.
     if (leetCodeNickname == null) {
       await context.reply('Неверный никнейм');
+      return;
+    }
+
+    final isLeetCodeNicknameExist = await _leetCodeRepository.isUserExist(leetCodeNickname);
+
+    if (!isLeetCodeNicknameExist) {
+      await context.reply('Такого никнейма не существует');
       return;
     }
 

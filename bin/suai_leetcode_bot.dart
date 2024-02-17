@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 
+import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:sqlite3/open.dart' as sqlite;
 import 'package:suai_leetcode_bot/bot/repositories/runtime_repository.dart';
@@ -9,7 +10,9 @@ import 'package:suai_leetcode_bot/bot/scopes/register/register_scope.dart';
 import 'package:suai_leetcode_bot/bot/scopes/register/register_state.dart';
 import 'package:suai_leetcode_bot/bot/telegram_bot.dart';
 import 'package:suai_leetcode_bot/config/config.dart';
+import 'package:suai_leetcode_bot/data/api/leetcode_api.dart';
 import 'package:suai_leetcode_bot/data/database/database.dart';
+import 'package:suai_leetcode_bot/data/repositories/leetcode_repository.dart';
 
 void main() {
   sqlite.open
@@ -18,11 +21,18 @@ void main() {
 
   final database = AppDatabase();
   final config = _readConfig();
+  final httpClient = http.Client();
+
+  final leetCodeRepository = HttpLeetCodeRepository(
+    api: const LeetCodeApi(),
+    client: httpClient,
+  );
 
   final scopes = [
     RegisterScope(
       database: database,
       repository: RuntimeRepository(initialState: const RegisterInitial()),
+      leetCodeRepository: leetCodeRepository,
     ),
   ];
 
