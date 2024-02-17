@@ -94,6 +94,15 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
+  Future<bool> isLeetCodeNicknameAlreadyTaken(String leetCodeNickname) async {
+    final leetCodeAccount = await (select(leetCodeAccounts)
+          ..where((l) => l.nickname.equals(leetCodeNickname))
+          ..limit(1))
+        .getSingleOrNull();
+
+    return leetCodeAccount != null;
+  }
+
   Future<void> createUserWithLeetCodeAccount({
     required int telegramId,
     required String name,

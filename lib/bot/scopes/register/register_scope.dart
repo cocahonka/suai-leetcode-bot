@@ -5,6 +5,7 @@ import 'package:suai_leetcode_bot/bot/scopes/telegram_scope.dart';
 import 'package:suai_leetcode_bot/constants/group_numbers.dart';
 import 'package:suai_leetcode_bot/data/database/database.dart';
 import 'package:suai_leetcode_bot/data/repositories/leetcode_repository.dart';
+import 'package:suai_leetcode_bot/extensions/int_extensions.dart';
 import 'package:televerse/televerse.dart';
 
 final class RegisterScope extends TelegramScope<RegisterState> {
@@ -107,8 +108,15 @@ final class RegisterScope extends TelegramScope<RegisterState> {
   ) async {
     final leetCodeNickname = context.message!.text?.trim();
 
-    if (leetCodeNickname == null) {
+    if (leetCodeNickname == null || !leetCodeNickname.length.inRange(3, 32)) {
       await context.reply('Неверный никнейм');
+      return;
+    }
+
+    final isLeetCodeNicknameAlreadyTaken = await _database.isLeetCodeNicknameAlreadyTaken(leetCodeNickname);
+
+    if (isLeetCodeNicknameAlreadyTaken) {
+      await context.reply('Данный никнейм уже зарегестрирован в боте');
       return;
     }
 
