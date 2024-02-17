@@ -3,15 +3,16 @@ import 'package:suai_leetcode_bot/data/api/leetcode_api.dart';
 
 final class HttpLeetCodeRepository {
   const HttpLeetCodeRepository({
-    required this.api,
-    required this.client,
-  });
+    required LeetCodeApi api,
+    required http.Client client,
+  })  : _api = api,
+        _client = client;
 
-  final LeetCodeApi api;
-  final http.Client client;
+  final LeetCodeApi _api;
+  final http.Client _client;
 
   Future<bool> isUserExist(String nickname) async {
-    final response = await client.get(api.user(nickname));
+    final response = await _client.get(_api.user(nickname));
     return switch (response.statusCode) {
       200 => true,
       404 => false,
