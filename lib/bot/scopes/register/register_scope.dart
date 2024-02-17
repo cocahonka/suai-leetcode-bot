@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:suai_leetcode_bot/bot/scopes/register/register_state.dart';
 import 'package:suai_leetcode_bot/bot/scopes/telegram_scope.dart';
+import 'package:suai_leetcode_bot/constants/group_numbers.dart';
 import 'package:suai_leetcode_bot/database/database.dart';
 import 'package:televerse/televerse.dart';
 
@@ -80,10 +81,9 @@ final class RegisterScope extends TelegramScope<RegisterState> {
     int chatId,
     RegisterWaitingForGroupNumber state,
   ) async {
-    final groupNumber = context.message!.text?.trim();
+    final groupNumber = context.message!.text?.trim().toUpperCase();
 
-    // TODO(cocahonka): Validate group number.
-    if (groupNumber == null) {
+    if (groupNumber == null || !kGroupNumbers.contains(groupNumber)) {
       await context.reply('Неверный номер группы');
       return;
     }
