@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:suai_leetcode_bot/bot/scopes/register/register_state.dart';
 import 'package:suai_leetcode_bot/bot/scopes/telegram_scope.dart';
 import 'package:suai_leetcode_bot/constants/group_numbers.dart';
-import 'package:suai_leetcode_bot/database/database.dart';
+import 'package:suai_leetcode_bot/data/database/database.dart';
 import 'package:televerse/televerse.dart';
 
 final class RegisterScope extends TelegramScope<RegisterState> {

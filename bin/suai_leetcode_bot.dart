@@ -9,7 +9,7 @@ import 'package:suai_leetcode_bot/bot/scopes/register/register_scope.dart';
 import 'package:suai_leetcode_bot/bot/scopes/register/register_state.dart';
 import 'package:suai_leetcode_bot/bot/telegram_bot.dart';
 import 'package:suai_leetcode_bot/config/config.dart';
-import 'package:suai_leetcode_bot/database/database.dart';
+import 'package:suai_leetcode_bot/data/database/database.dart';
 
 void main() {
   sqlite.open

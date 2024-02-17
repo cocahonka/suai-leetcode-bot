@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:suai_leetcode_bot/bot/scopes/telegram_scope.dart';
 import 'package:suai_leetcode_bot/config/config.dart';
-import 'package:suai_leetcode_bot/database/database.dart';
+import 'package:suai_leetcode_bot/data/database/database.dart';
 import 'package:televerse/televerse.dart';
 
 class TelegramBot {
