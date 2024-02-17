@@ -35,6 +35,7 @@ void main() async {
 
   final scopes = [
     RegisterScope(
+      messages: config.registerMessages,
       database: database,
       repository: registerRepository,
       leetCodeRepository: leetCodeRepository,
