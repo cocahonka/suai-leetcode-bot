@@ -1,3 +1,5 @@
+import 'package:http/http.dart' as http;
+
 final class LeetCodeApi {
   const LeetCodeApi();
 
@@ -11,4 +13,16 @@ final class LeetCodeApi {
       path: '/$nickname/',
     );
   }
+}
+
+sealed class LeetCodeApiException implements Exception {
+  const LeetCodeApiException(this.message);
+  final String message;
+}
+
+class UnknownCodeException extends LeetCodeApiException {
+  const UnknownCodeException(this.statusCode, this.response) : super('Unknow code $statusCode');
+
+  final int statusCode;
+  final http.Response response;
 }
