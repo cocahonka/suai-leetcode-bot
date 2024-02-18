@@ -21,8 +21,16 @@ class TelegramBot {
   void start() {
     _bot.start(_onStart);
 
-    for (final TelegramScope(:predicate, :callback, :debugName) in _scopes) {
-      _bot.filter(predicate, callback, name: debugName);
+    for (final TelegramScope(
+          :predicate,
+          :callbackOnMessage,
+          :identificator,
+          :queryPattern,
+          :callbackOnQuery,
+        ) in _scopes) {
+      _bot
+        ..filter(predicate, callbackOnMessage, name: identificator)
+        ..callbackQuery(queryPattern, callbackOnQuery);
     }
   }
 

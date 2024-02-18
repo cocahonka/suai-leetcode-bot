@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
+import 'package:suai_leetcode_bot/bot/scopes/register/register_query_event.dart';
 import 'package:suai_leetcode_bot/bot/scopes/register/register_state.dart';
 import 'package:suai_leetcode_bot/bot/scopes/telegram_scope.dart';
 import 'package:suai_leetcode_bot/config/config.dart';
@@ -23,8 +25,15 @@ final class RegisterScope extends TelegramScope<RegisterState> {
   final AppDatabase _database;
   final HttpLeetCodeRepository _leetCodeRepository;
 
+  late final InlineKeyboard _restartKeyboard = InlineKeyboard()
+      .add(
+        'Restart',
+        generateQueryData(RegisterQueryEvent.restart),
+      )
+      .row();
+
   @override
-  String get debugName => 'Register scope';
+  String get identificator => 'register_scope';
 
   @override
   bool predicate(Context<Session> context) {
@@ -38,7 +47,7 @@ final class RegisterScope extends TelegramScope<RegisterState> {
   }
 
   @override
-  FutureOr<void> callback(Context<Session> context) async {
+  FutureOr<void> callbackOnMessage(Context<Session> context) async {
     final chatId = context.chat!.id;
     final state = repository.getState(chatId: chatId);
 
@@ -49,6 +58,33 @@ final class RegisterScope extends TelegramScope<RegisterState> {
       RegisterWaitingForLeetCodeNickname() => _takeLeetCodeNickname(context, chatId, state),
       RegisterCompleted() => Future<void>.value(),
     };
+  }
+
+  @override
+  FutureOr<void> callbackOnQuery(Context<Session> context) async {
+    final chatId = context.chat!.id;
+    final state = repository.getState(chatId: chatId);
+
+    if (state is RegisterCompleted) return;
+
+    final queryData = context.callbackQuery!.data!;
+    final queryEventIdentificator = queryPattern.firstMatch(queryData)!.group(1)!;
+    final queryEvent = RegisterQueryEvent.values.firstWhereOrNull(
+      (value) => value.name == queryEventIdentificator,
+    );
+
+    switch (queryEvent) {
+      case RegisterQueryEvent.restart:
+        repository.setState(
+          chatId: chatId,
+          state: const RegisterInitial(),
+        );
+        await context.editMessageText('Сброс регистрации');
+      case null:
+        throw StateError('Event ($queryEventIdentificator) not recognized');
+    }
+
+    await callbackOnMessage(context);
   }
 
   Future<void> _requestName(
@@ -77,7 +113,7 @@ final class RegisterScope extends TelegramScope<RegisterState> {
       return;
     }
 
-    await context.reply(_messages.requestGroupNumber);
+    await context.reply(_messages.requestGroupNumber, replyMarkup: _restartKeyboard);
 
     repository.setState(
       chatId: chatId,
@@ -93,11 +129,11 @@ final class RegisterScope extends TelegramScope<RegisterState> {
     final groupNumber = context.message!.text?.trim().toUpperCase();
 
     if (groupNumber == null || !kGroupNumbers.contains(groupNumber)) {
-      await context.reply(_messages.invalidGroupNumber);
+      await context.reply(_messages.invalidGroupNumber, replyMarkup: _restartKeyboard);
       return;
     }
 
-    await context.reply(_messages.requestLeetCodeNickname);
+    await context.reply(_messages.requestLeetCodeNickname, replyMarkup: _restartKeyboard);
 
     repository.setState(
       chatId: chatId,
@@ -113,21 +149,21 @@ final class RegisterScope extends TelegramScope<RegisterState> {
     final leetCodeNickname = context.message!.text?.trim();
 
     if (leetCodeNickname == null || !leetCodeNickname.length.inRange(3, 32)) {
-      await context.reply(_messages.invalidLeetCodeNickname);
+      await context.reply(_messages.invalidLeetCodeNickname, replyMarkup: _restartKeyboard);
       return;
     }
 
     final isLeetCodeNicknameAlreadyTaken = await _database.isLeetCodeNicknameAlreadyTaken(leetCodeNickname);
 
     if (isLeetCodeNicknameAlreadyTaken) {
-      await context.reply(_messages.leetCodeNicknameIsAlreadyTaken);
+      await context.reply(_messages.leetCodeNicknameIsAlreadyTaken, replyMarkup: _restartKeyboard);
       return;
     }
 
     final isLeetCodeNicknameExist = await _leetCodeRepository.isUserExist(leetCodeNickname);
 
     if (!isLeetCodeNicknameExist) {
-      await context.reply(_messages.leetCodeNicknameNotExist);
+      await context.reply(_messages.leetCodeNicknameNotExist, replyMarkup: _restartKeyboard);
       return;
     }
 

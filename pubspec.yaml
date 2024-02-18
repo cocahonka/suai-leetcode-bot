@@ -6,6 +6,7 @@ environment:
   sdk: ^3.2.6
 
 dependencies:
+  collection: ^1.18.0
   drift: ^2.15.0
   http: ^1.2.0
   meta: ^1.12.0
