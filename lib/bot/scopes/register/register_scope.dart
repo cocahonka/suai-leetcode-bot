@@ -173,7 +173,7 @@ final class RegisterScope extends TelegramScope<RegisterState> {
       groupNumber: state.groupNumber,
       leetCodeNickname: leetCodeNickname,
     );
-    await context.reply('Аккаунт успешно создан!');
+    await context.reply(_messages.successfulRegistration);
 
     repository.setState(chatId: chatId, state: const RegisterCompleted());
   }

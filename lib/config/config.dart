@@ -24,6 +24,7 @@ class Config {
             'leetCodeNicknameIsAlreadyTaken': final String leetCodeNicknameIsAlreadyTaken,
             'leetCodeNicknameNotExist': final String leetCodeNicknameNotExist,
             'successfulRegistration': final String successfulRegistration,
+            'restartRegistration': final String restartRegistration,
           },
         },
       } =>
@@ -40,6 +41,7 @@ class Config {
             leetCodeNicknameIsAlreadyTaken: leetCodeNicknameIsAlreadyTaken,
             leetCodeNicknameNotExist: leetCodeNicknameNotExist,
             successfulRegistration: successfulRegistration,
+            restartRegistration: restartRegistration,
           ),
         ),
       _ => throw const FormatException('The configuration file does not match the template')
@@ -66,6 +68,7 @@ class RegisterMessages extends Messages {
     required this.leetCodeNicknameIsAlreadyTaken,
     required this.leetCodeNicknameNotExist,
     required this.successfulRegistration,
+    required this.restartRegistration,
   });
 
   final String requestName;
@@ -77,4 +80,5 @@ class RegisterMessages extends Messages {
   final String leetCodeNicknameIsAlreadyTaken;
   final String leetCodeNicknameNotExist;
   final String successfulRegistration;
+  final String restartRegistration;
 }
