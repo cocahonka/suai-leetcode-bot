@@ -44,7 +44,6 @@ void main() async {
 
   TelegramBot(
     config: config,
-    database: database,
     scopes: scopes,
   ).start();
 }

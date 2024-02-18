@@ -36,6 +36,24 @@ final class RegisterScope extends TelegramScope<RegisterState> {
   String get identificator => 'register_scope';
 
   @override
+  RegExp get commands => RegExp('start');
+
+  @override
+  FutureOr<void> callbackOnCommand(Context<Session> context) async {
+    final chatId = context.chat!.id;
+    final command = context.message!.text!;
+    final state = repository.getState(chatId: chatId);
+
+    if (RegExp('start').hasMatch(command)) {
+      if (state case RegisterInitial()) {
+        await context.reply('Привет это бот для кружка АиСД');
+      }
+    }
+
+    await callbackOnMessage(context);
+  }
+
+  @override
   bool predicate(Context<Session> context) {
     final chatId = context.chat?.id;
     final message = context.message;

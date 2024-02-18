@@ -9,6 +9,9 @@ abstract base class TelegramScope<State> {
   abstract final String identificator;
   final TelegramStateRepository<State> repository;
 
+  RegExp get commands;
+  FutureOr<void> callbackOnCommand(Context<Session> context);
+
   bool predicate(Context<Session> context);
   FutureOr<void> callbackOnMessage(Context<Session> context);
 
