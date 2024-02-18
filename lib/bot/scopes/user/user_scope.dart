@@ -72,4 +72,9 @@ final class UserScope extends TelegramScope<UserState> {
         throw StateError('Event ($queryEventIdentificator) not recognized');
     }
   }
+
+  @override
+  FutureOr<void> executeInitialStatePoint(Context<Session> context) async {
+    await callbackOnMessage(context);
+  }
 }

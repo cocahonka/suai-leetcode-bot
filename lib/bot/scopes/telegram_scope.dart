@@ -4,10 +4,16 @@ import 'package:suai_leetcode_bot/bot/repositories/telegram_state_repository.dar
 import 'package:televerse/televerse.dart';
 
 abstract base class TelegramScope<State> {
-  const TelegramScope({required this.repository});
+  const TelegramScope({
+    required this.repository,
+    this.onStateComplete,
+  });
 
   abstract final String identificator;
   final TelegramStateRepository<State> repository;
+
+  final FutureOr<void> Function(Context<Session> context)? onStateComplete;
+  FutureOr<void> executeInitialStatePoint(Context<Session> context) {}
 
   RegExp get commands;
   FutureOr<void> callbackOnCommand(Context<Session> context);

@@ -16,6 +16,7 @@ final class RegisterScope extends TelegramScope<RegisterState> {
     required RegisterMessages messages,
     required AppDatabase database,
     required HttpLeetCodeRepository leetCodeRepository,
+    required super.onStateComplete,
     required super.repository,
   })  : _messages = messages,
         _database = database,
@@ -194,5 +195,7 @@ final class RegisterScope extends TelegramScope<RegisterState> {
     await context.reply(_messages.successfulRegistration);
 
     repository.setState(chatId: chatId, state: const RegisterCompleted());
+
+    onStateComplete?.call(context);
   }
 }

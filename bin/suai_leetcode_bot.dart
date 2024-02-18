@@ -36,19 +36,21 @@ void main() async {
     registerRepository.setState(chatId: telegramId, state: const RegisterCompleted());
   }
 
-  final scopes = <TelegramScope<dynamic>>[
-    UserScope(
-      messages: config.userMessages,
-      database: database,
-      repository: RuntimeRepository<UserState>(initialState: const UserInitial()),
-    ),
-    RegisterScope(
-      messages: config.registerMessages,
-      database: database,
-      repository: registerRepository,
-      leetCodeRepository: leetCodeRepository,
-    ),
-  ];
+  final userScope = UserScope(
+    messages: config.userMessages,
+    database: database,
+    repository: RuntimeRepository<UserState>(initialState: const UserInitial()),
+  );
+
+  final registerScope = RegisterScope(
+    messages: config.registerMessages,
+    database: database,
+    repository: registerRepository,
+    leetCodeRepository: leetCodeRepository,
+    onStateComplete: userScope.executeInitialStatePoint,
+  );
+
+  final scopes = <TelegramScope<dynamic>>[userScope, registerScope];
 
   TelegramBot(
     config: config,
