@@ -8,6 +8,9 @@ import 'package:sqlite3/open.dart' as sqlite;
 import 'package:suai_leetcode_bot/bot/repositories/runtime_repository.dart';
 import 'package:suai_leetcode_bot/bot/scopes/register/register_scope.dart';
 import 'package:suai_leetcode_bot/bot/scopes/register/register_state.dart';
+import 'package:suai_leetcode_bot/bot/scopes/telegram_scope.dart';
+import 'package:suai_leetcode_bot/bot/scopes/user/user_scope.dart';
+import 'package:suai_leetcode_bot/bot/scopes/user/user_state.dart';
 import 'package:suai_leetcode_bot/bot/telegram_bot.dart';
 import 'package:suai_leetcode_bot/config/config.dart';
 import 'package:suai_leetcode_bot/data/api/leetcode_api.dart';
@@ -33,7 +36,12 @@ void main() async {
     registerRepository.setState(chatId: telegramId, state: const RegisterCompleted());
   }
 
-  final scopes = [
+  final scopes = <TelegramScope<dynamic>>[
+    UserScope(
+      messages: config.userMessages,
+      database: database,
+      repository: RuntimeRepository<UserState>(initialState: const UserInitial()),
+    ),
     RegisterScope(
       messages: config.registerMessages,
       database: database,

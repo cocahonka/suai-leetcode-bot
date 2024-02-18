@@ -6,6 +6,7 @@ class Config {
     required this.telegramToken,
     required this.leetCodeUpdateIntervalMs,
     required this.registerMessages,
+    required this.userMessages,
   });
 
   factory Config.fromJson(Map<String, dynamic> json) {
@@ -43,6 +44,7 @@ class Config {
             successfulRegistration: successfulRegistration,
             restartRegistration: restartRegistration,
           ),
+          userMessages: const UserMessages(),
         ),
       _ => throw const FormatException('The configuration file does not match the template')
     };
@@ -51,6 +53,7 @@ class Config {
   final String telegramToken;
   final int leetCodeUpdateIntervalMs;
   final RegisterMessages registerMessages;
+  final UserMessages userMessages;
 }
 
 sealed class Messages {
@@ -81,4 +84,8 @@ class RegisterMessages extends Messages {
   final String leetCodeNicknameNotExist;
   final String successfulRegistration;
   final String restartRegistration;
+}
+
+class UserMessages extends Messages {
+  const UserMessages();
 }
