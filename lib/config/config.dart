@@ -28,6 +28,20 @@ class Config {
             'successfulRegistration': final String successfulRegistration,
             'restartRegistration': final String restartRegistration,
           },
+          'user': {
+            'chooseMenuItem': final String chooseMenuItem,
+            'aboutClubCaption': final String aboutClubCaption,
+            'aboutClubLink': final String aboutClubLink,
+            'olympiadsCaption': final String olympiadsCaption,
+            'olympiadsLink': final String olympiadsLink,
+            'joinClubCaption': final String joinClubCaption,
+            'joinClubLink': final String joinClubLink,
+            'categoryListCaption': final String categoryListCaption,
+            'backToMenu': final String backToMenu,
+            'backToCategories': final String backToCategories,
+            'chooseCategory': final String chooseCategory,
+            'taskLinkCaption': final String taskLinkCaption,
+          }
         },
       } =>
         Config(
@@ -46,7 +60,20 @@ class Config {
             successfulRegistration: successfulRegistration,
             restartRegistration: restartRegistration,
           ),
-          userMessages: const UserMessages(),
+          userMessages: UserMessages(
+            chooseMenuItem: chooseMenuItem,
+            aboutClubCaption: aboutClubCaption,
+            aboutClubLink: aboutClubLink,
+            olympiadsCaption: olympiadsCaption,
+            olympiadsLink: olympiadsLink,
+            joinClubCaption: joinClubCaption,
+            joinClubLink: joinClubLink,
+            categoryListCaption: categoryListCaption,
+            backToMenu: backToMenu,
+            backToCategories: backToCategories,
+            chooseCategory: chooseCategory,
+            taskLinkCaption: taskLinkCaption,
+          ),
         ),
       _ => throw const FormatException('The configuration file does not match the template')
     };
@@ -91,5 +118,31 @@ class RegisterMessages extends Messages {
 }
 
 class UserMessages extends Messages {
-  const UserMessages();
+  const UserMessages({
+    required this.chooseMenuItem,
+    required this.aboutClubCaption,
+    required this.aboutClubLink,
+    required this.olympiadsCaption,
+    required this.olympiadsLink,
+    required this.joinClubCaption,
+    required this.joinClubLink,
+    required this.categoryListCaption,
+    required this.backToMenu,
+    required this.backToCategories,
+    required this.chooseCategory,
+    required this.taskLinkCaption,
+  });
+
+  final String chooseMenuItem;
+  final String aboutClubCaption;
+  final String aboutClubLink;
+  final String olympiadsCaption;
+  final String olympiadsLink;
+  final String joinClubCaption;
+  final String joinClubLink;
+  final String categoryListCaption;
+  final String backToMenu;
+  final String backToCategories;
+  final String chooseCategory;
+  final String taskLinkCaption;
 }

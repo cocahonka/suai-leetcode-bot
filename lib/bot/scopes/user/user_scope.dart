@@ -42,15 +42,15 @@ final class UserScope extends TelegramScope<UserState> {
   @override
   FutureOr<void> callbackOnMessage(Context<Session> context) async {
     await context.reply(
-      'Выберите действие',
+      _messages.chooseMenuItem,
       replyMarkup: InlineKeyboard()
-          .addUrl('О кружке', 'https://vk.com/cocahonka')
+          .addUrl(_messages.aboutClubCaption, _messages.aboutClubLink)
           .row()
-          .addUrl('Олимпиады', 'https://vk.com/cocahonka')
+          .addUrl(_messages.olympiadsCaption, _messages.olympiadsLink)
           .row()
-          .addUrl('Записаться', 'https://vk.com/cocahonka')
+          .addUrl(_messages.joinClubCaption, _messages.joinClubLink)
           .row()
-          .add('Список категорий', '${identificator}_${UserQueryEvent.showCategories.name}')
+          .add(_messages.categoryListCaption, '${identificator}_${UserQueryEvent.showCategories.name}')
           .row(),
     );
   }
@@ -75,8 +75,6 @@ final class UserScope extends TelegramScope<UserState> {
       case UserQueryEvent.backToCategories:
         await _showCategories(context);
       case null:
-
-      //throw StateError('Event ($queryEventIdentificator) not recognized');
     }
   }
 
@@ -90,10 +88,10 @@ final class UserScope extends TelegramScope<UserState> {
     }
 
     keyboard
-      ..add('Назад', '${identificator}_${UserQueryEvent.backToMenu.name}')
+      ..add(_messages.backToMenu, '${identificator}_${UserQueryEvent.backToMenu.name}')
       ..row();
 
-    await context.reply('Выберите категорию', replyMarkup: keyboard);
+    await context.reply(_messages.chooseCategory, replyMarkup: keyboard);
   }
 
   Future<void> _showCategory(Context<Session> context, int categoryId) async {
@@ -102,7 +100,7 @@ final class UserScope extends TelegramScope<UserState> {
     final tasks = await _database.getTasksWithUserSolutions(categoryId: categoryId, telegramId: chatId);
 
     final keyboard = InlineKeyboard().add(
-      'Назад',
+      _messages.backToCategories,
       '${identificator}_${UserQueryEvent.backToCategories.name}',
     );
 
@@ -118,7 +116,7 @@ final class UserScope extends TelegramScope<UserState> {
         ..write(' ${task.complexity.cutName}')
         ..write(' ${task.id}')
         ..write(' ${task.title}')
-        ..write(' <a href="${task.link}">ссылка</a>')
+        ..write(' <a href="${task.link}">${_messages.taskLinkCaption}</a>')
         ..writeln();
     }
 
