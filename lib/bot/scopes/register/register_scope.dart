@@ -47,7 +47,7 @@ final class RegisterScope extends TelegramScope<RegisterState> {
 
     if (RegExp('start').hasMatch(command)) {
       if (state case RegisterInitial()) {
-        await context.reply('Привет это бот для кружка АиСД');
+        await context.reply(_messages.onStart);
       }
     }
 
@@ -98,9 +98,8 @@ final class RegisterScope extends TelegramScope<RegisterState> {
           chatId: chatId,
           state: const RegisterInitial(),
         );
-        await context.editMessageText('Сброс регистрации');
+        await context.editMessageText(_messages.restartRegistration);
       case null:
-      //throw StateError('Event ($queryEventIdentificator) not recognized');
     }
 
     await callbackOnMessage(context);

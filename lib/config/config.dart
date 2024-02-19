@@ -16,6 +16,7 @@ class Config {
         'leetCodeUpdateIntervalMs': final int leetCodeUpdateIntervalMs,
         'messages': {
           'register': {
+            'onStart': final String onStart,
             'requestName': final String requestName,
             'invalidName': final String invalidName,
             'requestGroupNumber': final String requestGroupNumber,
@@ -33,6 +34,7 @@ class Config {
           telegramToken: telegramToken,
           leetCodeUpdateIntervalMs: leetCodeUpdateIntervalMs,
           registerMessages: RegisterMessages(
+            onStart: onStart,
             requestName: requestName,
             invalidName: invalidName,
             requestGroupNumber: requestGroupNumber,
@@ -62,6 +64,7 @@ sealed class Messages {
 
 class RegisterMessages extends Messages {
   const RegisterMessages({
+    required this.onStart,
     required this.requestName,
     required this.invalidName,
     required this.requestGroupNumber,
@@ -74,6 +77,7 @@ class RegisterMessages extends Messages {
     required this.restartRegistration,
   });
 
+  final String onStart;
   final String requestName;
   final String invalidName;
   final String requestGroupNumber;
