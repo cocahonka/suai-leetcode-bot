@@ -105,7 +105,11 @@ class AppDatabase extends _$AppDatabase {
 
   Future<List<User>> get authorizedUsers => select(users).get();
 
-  Future<List<Category>> get allCategories => select(categories).get();
+  Future<List<Category>> get allCategories => (select(categories)
+        ..orderBy([
+          (c) => OrderingTerm.asc(c.sortingNumber),
+        ]))
+      .get();
 
   Future<Category> getCategory(int id) => (select(categories)..where((c) => c.id.equals(id))).getSingle();
 
