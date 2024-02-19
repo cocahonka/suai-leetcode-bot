@@ -106,6 +106,9 @@ class AppDatabase extends _$AppDatabase {
 
   Future<List<User>> get authorizedUsers => select(users).get();
 
+  Future<List<LeetCodeAccount>> get activeLeetCodeAccounts =>
+      (select(leetCodeAccounts)..where((l) => l.isGraduated.equals(false))).get();
+
   Future<List<Category>> get allCategories => (select(categories)
         ..orderBy([
           (c) => OrderingTerm.asc(c.sortingNumber),
@@ -116,6 +119,38 @@ class AppDatabase extends _$AppDatabase {
 
   Future<List<LeetCodeTask>> getTasks(int categoryId) =>
       (select(leetCodeTasks)..where((l) => l.category.equals(categoryId))).get();
+
+  Future<void> updateUserSubmissions({
+    required int userId,
+    required List<({String slug, int timestamp})> submissions,
+  }) async {
+    await batch((batch) async {
+      for (final (:slug, :timestamp) in submissions) {
+        final taskQuery = select(leetCodeTasks)
+          ..where((l) => l.slug.equals(slug))
+          ..limit(1);
+        final task = await taskQuery.getSingleOrNull();
+
+        if (task == null) return;
+
+        final solvedTaskQuery = select(solvedLeetCodeTasks)
+          ..where((st) => st.task.equals(task.id) & st.user.equals(userId))
+          ..limit(1);
+        final solvedTask = await solvedTaskQuery.getSingleOrNull();
+
+        if (solvedTask != null) return;
+
+        batch.insert(
+          solvedLeetCodeTasks,
+          SolvedLeetCodeTasksCompanion.insert(
+            user: userId,
+            task: task.id,
+            date: DateTime.fromMillisecondsSinceEpoch(timestamp),
+          ),
+        );
+      }
+    });
+  }
 
   Future<List<({LeetCodeTask task, bool isSolved})>> getTasksWithUserSolutions({
     required int categoryId,
