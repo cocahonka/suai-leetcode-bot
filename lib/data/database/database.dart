@@ -42,7 +42,8 @@ enum LeetCodeTaskComplexity {
 }
 
 class LeetCodeTasks extends Table {
-  IntColumn get id => integer().unique()();
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get slug => text().unique()();
   IntColumn get category => integer().references(Categories, #id)();
   TextColumn get title => text().withLength(min: 1, max: 128)();
   TextColumn get link => text().withLength(min: 1, max: 512)();
