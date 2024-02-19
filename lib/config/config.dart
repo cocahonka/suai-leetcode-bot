@@ -4,7 +4,7 @@ import 'package:meta/meta.dart';
 class Config {
   const Config({
     required this.telegramToken,
-    required this.leetCodeUpdateIntervalMs,
+    required this.leetCodeUpdateIntervalInSeconds,
     required this.registerMessages,
     required this.userMessages,
   });
@@ -13,7 +13,7 @@ class Config {
     return switch (json) {
       {
         'telegramToken': final String telegramToken,
-        'leetCodeUpdateIntervalMs': final int leetCodeUpdateIntervalMs,
+        'leetCodeUpdateIntervalInSeconds': final int leetCodeUpdateIntervalInSeconds,
         'messages': {
           'register': {
             'onStart': final String onStart,
@@ -46,7 +46,7 @@ class Config {
       } =>
         Config(
           telegramToken: telegramToken,
-          leetCodeUpdateIntervalMs: leetCodeUpdateIntervalMs,
+          leetCodeUpdateIntervalInSeconds: leetCodeUpdateIntervalInSeconds,
           registerMessages: RegisterMessages(
             onStart: onStart,
             requestName: requestName,
@@ -80,7 +80,7 @@ class Config {
   }
 
   final String telegramToken;
-  final int leetCodeUpdateIntervalMs;
+  final int leetCodeUpdateIntervalInSeconds;
   final RegisterMessages registerMessages;
   final UserMessages userMessages;
 }
