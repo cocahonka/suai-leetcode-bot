@@ -6,6 +6,7 @@ import 'package:suai_leetcode_bot/bot/scopes/user/user_query_event.dart';
 import 'package:suai_leetcode_bot/bot/scopes/user/user_state.dart';
 import 'package:suai_leetcode_bot/config/config.dart';
 import 'package:suai_leetcode_bot/data/database/database.dart';
+import 'package:televerse/telegram.dart';
 import 'package:televerse/televerse.dart';
 
 final class UserScope extends TelegramScope<UserState> {
@@ -95,14 +96,37 @@ final class UserScope extends TelegramScope<UserState> {
     await context.reply('Выберите категорию', replyMarkup: keyboard);
   }
 
-  Future<void> _showCategory(Context<Session> context, int id) async {
-    final category = await _database.getCategory(id);
+  Future<void> _showCategory(Context<Session> context, int categoryId) async {
+    final chatId = context.chat!.id;
+    final category = await _database.getCategory(categoryId);
+    final tasks = await _database.getTasksWithUserSolutions(categoryId: categoryId, telegramId: chatId);
+
+    final keyboard = InlineKeyboard().add(
+      'Назад',
+      '${identificator}_${UserQueryEvent.backToCategories.name}',
+    );
+
+    final content = StringBuffer()
+      ..writeln(category.title)
+      ..writeln(category.description)
+      ..writeln();
+
+    for (final (:task, :isSolved) in tasks) {
+      final taskMarker = isSolved ? '✅' : '❌';
+      content
+        ..write(taskMarker)
+        ..write(' ${task.complexity.cutName}')
+        ..write(' ${task.id}')
+        ..write(' ${task.title}')
+        ..write(' <a href="${task.link}">ссылка</a>')
+        ..writeln();
+    }
+
     await context.reply(
-      '${category.title}\n${category.description}',
-      replyMarkup: InlineKeyboard().add(
-        'Назад',
-        '${identificator}_${UserQueryEvent.backToCategories.name}',
-      ),
+      content.toString(),
+      replyMarkup: keyboard,
+      parseMode: ParseMode.html,
+      linkPreviewOptions: const LinkPreviewOptions(isDisabled: true),
     );
   }
 

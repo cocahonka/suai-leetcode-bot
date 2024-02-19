@@ -113,6 +113,29 @@ class AppDatabase extends _$AppDatabase {
 
   Future<Category> getCategory(int id) => (select(categories)..where((c) => c.id.equals(id))).getSingle();
 
+  Future<List<LeetCodeTask>> getTasks(int categoryId) =>
+      (select(leetCodeTasks)..where((l) => l.category.equals(categoryId))).get();
+
+  Future<List<({LeetCodeTask task, bool isSolved})>> getTasksWithUserSolutions({
+    required int categoryId,
+    required int telegramId,
+  }) async {
+    final tasksInCategory = await (select(leetCodeTasks)..where((t) => t.category.equals(categoryId))).get();
+
+    final user = await (select(users)
+          ..where((u) => u.telegramId.equals(telegramId))
+          ..limit(1))
+        .getSingle();
+
+    final solvedTaskIds =
+        await (select(solvedLeetCodeTasks)..where((st) => st.user.equals(user.id))).map((row) => row.task).get();
+
+    return tasksInCategory.map((task) {
+      final isSolved = solvedTaskIds.contains(task.id);
+      return (task: task, isSolved: isSolved);
+    }).toList();
+  }
+
   Future<void> createUserWithLeetCodeAccount({
     required int telegramId,
     required String name,
