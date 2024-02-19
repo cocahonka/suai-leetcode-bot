@@ -37,35 +37,40 @@ final class HttpLeetCodeRepository {
       'variables': {'username': nickname, 'limit': limit},
     };
 
-    final response = await _client.post(
-      _api.userSubmissions(),
-      headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'Mozilla/5.0',
-      },
-      body: jsonEncode(data),
-    );
+    try {
+      final response = await _client.post(
+        _api.userSubmissions(),
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'Mozilla/5.0',
+        },
+        body: jsonEncode(data),
+      );
 
-    if (response.statusCode != 200) {
+      if (response.statusCode != 200) {
+        // ignore: avoid_print
+        throw StateError('Error ${response.statusCode}: ${response.body}');
+      }
+
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+
+      if (json case {'data': {'recentAcSubmissionList': final List<dynamic> recentAcSubmissionList}}) {
+        final result = recentAcSubmissionList.map((entry) {
+          final map = entry as Map<String, dynamic>;
+          return (
+            slug: map['titleSlug'] as String,
+            timestamp: int.parse(map['timestamp'] as String),
+          );
+        });
+
+        return result.toList();
+      } else {
+        throw FormatException('Leetcode graphql dont match the format ($json)');
+      }
+    } catch (e, s) {
       // ignore: avoid_print
-      print('Error ${response.statusCode}: ${response.body}');
+      print('Error $e with stack trace $s');
       return null;
-    }
-
-    final json = jsonDecode(response.body) as Map<String, dynamic>;
-
-    if (json case {'data': {'recentAcSubmissionList': final List<dynamic> recentAcSubmissionList}}) {
-      final result = recentAcSubmissionList.map((entry) {
-        final map = entry as Map<String, dynamic>;
-        return (
-          slug: map['titleSlug'] as String,
-          timestamp: int.parse(map['timestamp'] as String),
-        );
-      });
-
-      return result.toList();
-    } else {
-      throw FormatException('Leetcode graphql dont match the format ($json)');
     }
   }
 }
