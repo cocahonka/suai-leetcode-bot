@@ -16,6 +16,7 @@ import 'package:suai_leetcode_bot/config/config.dart';
 import 'package:suai_leetcode_bot/data/api/leetcode_api.dart';
 import 'package:suai_leetcode_bot/data/database/database.dart';
 import 'package:suai_leetcode_bot/data/repositories/leetcode_repository.dart';
+import 'package:suai_leetcode_bot/service/leetcode_service.dart';
 
 void main() async {
   sqlite.open
@@ -55,6 +56,12 @@ void main() async {
   TelegramBot(
     config: config,
     scopes: scopes,
+  ).start();
+
+  LeetCodeService(
+    leetCodeUpdateIntervalInSeconds: config.leetCodeUpdateIntervalInSeconds,
+    database: database,
+    leetCodeRepository: leetCodeRepository,
   ).start();
 }
 
