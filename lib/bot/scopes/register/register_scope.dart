@@ -29,7 +29,7 @@ final class RegisterScope extends TelegramScope<RegisterState> {
   late final InlineKeyboard _restartKeyboard = InlineKeyboard()
       .add(
         'Restart',
-        generateQueryData(RegisterQueryEvent.restart),
+        '${identificator}_${RegisterQueryEvent.restart.name}',
       )
       .row();
 
@@ -100,7 +100,7 @@ final class RegisterScope extends TelegramScope<RegisterState> {
         );
         await context.editMessageText('Сброс регистрации');
       case null:
-        throw StateError('Event ($queryEventIdentificator) not recognized');
+      //throw StateError('Event ($queryEventIdentificator) not recognized');
     }
 
     await callbackOnMessage(context);

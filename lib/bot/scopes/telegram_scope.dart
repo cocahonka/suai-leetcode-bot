@@ -21,7 +21,7 @@ abstract base class TelegramScope<State> {
   bool predicate(Context<Session> context);
   FutureOr<void> callbackOnMessage(Context<Session> context);
 
-  RegExp get queryPattern => RegExp('^${identificator}_([a-zA-Z1-9_-]+)\$');
-  String generateQueryData<Value extends Enum>(Value value) => '${identificator}_${value.name}';
+  RegExp get queryPattern => RegExp('^${identificator}_' r'(\w+)');
+
   FutureOr<void> callbackOnQuery(Context<Session> context);
 }

@@ -49,28 +49,61 @@ final class UserScope extends TelegramScope<UserState> {
           .row()
           .addUrl('Записаться', 'https://vk.com/cocahonka')
           .row()
-          .add('Список категорий', generateQueryData(UserQueryEvent.showCategories))
+          .add('Список категорий', '${identificator}_${UserQueryEvent.showCategories.name}')
           .row(),
     );
   }
 
   @override
   FutureOr<void> callbackOnQuery(Context<Session> context) async {
-    final chatId = context.chat!.id;
+    await context.answerCallbackQuery();
+
     final queryData = context.callbackQuery!.data!;
     final queryEventIdentificator = queryPattern.firstMatch(queryData)!.group(1)!;
-    final queryEvent = UserQueryEvent.values.firstWhereOrNull(
-      (value) => value.name == queryEventIdentificator,
-    );
+    final queryEvent = UserQueryEvent.values.firstWhereOrNull((value) => value.name == queryEventIdentificator);
 
     switch (queryEvent) {
       case UserQueryEvent.showCategories:
-        return;
+        await _showCategories(context);
       case UserQueryEvent.showCategoryDetails:
-        return;
+        final categoryUri = Uri.parse(queryData);
+        final categoryId = categoryUri.queryParameters['id']!;
+        await _showCategory(context, int.parse(categoryId));
+      case UserQueryEvent.backToMenu:
+        await callbackOnMessage(context);
+      case UserQueryEvent.backToCategories:
+        await _showCategories(context);
       case null:
-        throw StateError('Event ($queryEventIdentificator) not recognized');
+
+      //throw StateError('Event ($queryEventIdentificator) not recognized');
     }
+  }
+
+  Future<void> _showCategories(Context<Session> context) async {
+    final categories = await _database.allCategories;
+    final keyboard = InlineKeyboard();
+    for (final Category(:id, :shortTitle) in categories) {
+      keyboard
+        ..add(shortTitle, '${identificator}_${UserQueryEvent.showCategoryDetails.name}?id=$id')
+        ..row();
+    }
+
+    keyboard
+      ..add('Назад', '${identificator}_${UserQueryEvent.backToMenu.name}')
+      ..row();
+
+    await context.reply('Выберите категорию', replyMarkup: keyboard);
+  }
+
+  Future<void> _showCategory(Context<Session> context, int id) async {
+    final category = await _database.getCategory(id);
+    await context.reply(
+      '${category.title}\n${category.description}',
+      replyMarkup: InlineKeyboard().add(
+        'Назад',
+        '${identificator}_${UserQueryEvent.backToCategories.name}',
+      ),
+    );
   }
 
   @override

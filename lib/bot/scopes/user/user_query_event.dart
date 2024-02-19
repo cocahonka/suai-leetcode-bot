@@ -1,6 +1,9 @@
 enum UserQueryEvent {
   showCategories(),
-  showCategoryDetails();
+  showCategoryDetails(),
+
+  backToMenu(),
+  backToCategories();
 
   const UserQueryEvent();
 }
