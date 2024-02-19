@@ -13,6 +13,14 @@ final class LeetCodeApi {
       path: '/$nickname/',
     );
   }
+
+  Uri userSubmissions() {
+    return Uri(
+      scheme: 'https',
+      host: _apiBaseUrl,
+      path: _grapqlPath,
+    );
+  }
 }
 
 sealed class LeetCodeApiException implements Exception {
