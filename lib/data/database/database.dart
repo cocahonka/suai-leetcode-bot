@@ -105,6 +105,10 @@ class AppDatabase extends _$AppDatabase {
 
   Future<List<User>> get authorizedUsers => select(users).get();
 
+  Future<List<Category>> get allCategories => select(categories).get();
+
+  Future<Category> getCategory(int id) => (select(categories)..where((c) => c.id.equals(id))).getSingle();
+
   Future<void> createUserWithLeetCodeAccount({
     required int telegramId,
     required String name,
