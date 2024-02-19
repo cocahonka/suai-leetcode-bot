@@ -54,7 +54,7 @@ class SolvedLeetCodeTasks extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get user => integer().references(Users, #id)();
   IntColumn get task => integer().references(LeetCodeTasks, #id)();
-  DateTimeColumn get date => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get date => dateTime()();
 }
 
 @DriftDatabase(
