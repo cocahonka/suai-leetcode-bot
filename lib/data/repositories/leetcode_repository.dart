@@ -54,7 +54,7 @@ final class HttpLeetCodeRepository {
         body: jsonEncode(data),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode != 200) {
         throw HttpException('Error ${response.statusCode}: ${response.body}');
       }
 
