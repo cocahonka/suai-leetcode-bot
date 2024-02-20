@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:suai_leetcode_bot/data/api/leetcode_api.dart';
+import 'package:suai_leetcode_bot/service/logger_service.dart';
 
 final class HttpLeetCodeRepository {
   const HttpLeetCodeRepository({
@@ -13,13 +14,18 @@ final class HttpLeetCodeRepository {
   final LeetCodeApi _api;
   final http.Client _client;
 
-  Future<bool> isUserExist(String nickname) async {
-    final response = await _client.get(_api.user(nickname));
-    return switch (response.statusCode) {
-      200 => true,
-      404 => false,
-      final unknownCode => throw UnknownCodeException(unknownCode, response),
-    };
+  Future<bool?> isUserExist(String nickname) async {
+    try {
+      final response = await _client.get(_api.user(nickname));
+      return switch (response.statusCode) {
+        200 => true,
+        404 => false,
+        final unknownCode => throw UnknownCodeException(unknownCode, response),
+      };
+    } on UnknownCodeException catch (e, s) {
+      LoggerService().writeError(e, s);
+      return null;
+    }
   }
 
   Future<List<({String slug, int timestamp})>?> getRecentUserSubmission(String nickname, [int limit = 10]) async {
@@ -48,7 +54,6 @@ final class HttpLeetCodeRepository {
       );
 
       if (response.statusCode != 200) {
-        // ignore: avoid_print
         throw StateError('Error ${response.statusCode}: ${response.body}');
       }
 
@@ -67,9 +72,8 @@ final class HttpLeetCodeRepository {
       } else {
         throw FormatException('Leetcode graphql dont match the format ($json)');
       }
-    } catch (e, s) {
-      // ignore: avoid_print
-      print('Error $e with stack trace $s');
+    } on Exception catch (e, s) {
+      LoggerService().writeError(e, s);
       return null;
     }
   }

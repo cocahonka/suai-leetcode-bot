@@ -27,6 +27,7 @@ class Config {
             'leetCodeNicknameNotExist': final String leetCodeNicknameNotExist,
             'successfulRegistration': final String successfulRegistration,
             'restartRegistration': final String restartRegistration,
+            'leetCodeNicknameGetError': final String leetCodeNicknameGetError,
           },
           'user': {
             'chooseMenuItem': final String chooseMenuItem,
@@ -60,6 +61,7 @@ class Config {
             leetCodeNicknameNotExist: leetCodeNicknameNotExist,
             successfulRegistration: successfulRegistration,
             restartRegistration: restartRegistration,
+            leetCodeNicknameGetError: leetCodeNicknameGetError,
           ),
           userMessages: UserMessages(
             chooseMenuItem: chooseMenuItem,
@@ -104,6 +106,7 @@ class RegisterMessages extends Messages {
     required this.leetCodeNicknameNotExist,
     required this.successfulRegistration,
     required this.restartRegistration,
+    required this.leetCodeNicknameGetError,
   });
 
   final String onStart;
@@ -117,6 +120,7 @@ class RegisterMessages extends Messages {
   final String leetCodeNicknameNotExist;
   final String successfulRegistration;
   final String restartRegistration;
+  final String leetCodeNicknameGetError;
 }
 
 class UserMessages extends Messages {

@@ -181,6 +181,11 @@ final class RegisterScope extends TelegramScope<RegisterState> {
 
     final isLeetCodeNicknameExist = await _leetCodeRepository.isUserExist(leetCodeNickname);
 
+    if (isLeetCodeNicknameExist == null) {
+      await context.reply(_messages.leetCodeNicknameGetError, replyMarkup: _restartKeyboard);
+      return;
+    }
+
     if (!isLeetCodeNicknameExist) {
       await context.reply(_messages.leetCodeNicknameNotExist, replyMarkup: _restartKeyboard);
       return;
