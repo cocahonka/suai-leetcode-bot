@@ -41,6 +41,7 @@ class Config {
             'backToCategories': final String backToCategories,
             'chooseCategory': final String chooseCategory,
             'taskLinkCaption': final String taskLinkCaption,
+            'howItWorks': final String howItWorks,
           }
         },
       } =>
@@ -73,6 +74,7 @@ class Config {
             backToCategories: backToCategories,
             chooseCategory: chooseCategory,
             taskLinkCaption: taskLinkCaption,
+            howItWorks: howItWorks,
           ),
         ),
       _ => throw const FormatException('The configuration file does not match the template')
@@ -131,6 +133,7 @@ class UserMessages extends Messages {
     required this.backToCategories,
     required this.chooseCategory,
     required this.taskLinkCaption,
+    required this.howItWorks,
   });
 
   final String chooseMenuItem;
@@ -145,4 +148,5 @@ class UserMessages extends Messages {
   final String backToCategories;
   final String chooseCategory;
   final String taskLinkCaption;
+  final String howItWorks;
 }
