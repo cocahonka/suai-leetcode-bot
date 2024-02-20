@@ -9,6 +9,7 @@ import 'package:suai_leetcode_bot/constants/group_numbers.dart';
 import 'package:suai_leetcode_bot/data/database/database.dart';
 import 'package:suai_leetcode_bot/data/repositories/leetcode_repository.dart';
 import 'package:suai_leetcode_bot/extensions/int_extensions.dart';
+import 'package:suai_leetcode_bot/extensions/string_extensions.dart';
 import 'package:televerse/televerse.dart';
 
 final class RegisterScope extends TelegramScope<RegisterState> {
@@ -123,8 +124,8 @@ final class RegisterScope extends TelegramScope<RegisterState> {
     int chatId,
     RegisterWaitingForName state,
   ) async {
-    final name = context.message!.text?.trim();
-    final validateRegex = RegExp(r'^[а-яА-ЯёЁ]{2,32}$');
+    final name = context.message!.text?.trim().toLowerCase().eachCapitalize();
+    final validateRegex = RegExp(r'^[а-яА-ЯёЁ]{2,32} [а-яА-ЯёЁ]{2,32}$');
 
     if (name == null || !validateRegex.hasMatch(name)) {
       await context.reply(_messages.invalidName);

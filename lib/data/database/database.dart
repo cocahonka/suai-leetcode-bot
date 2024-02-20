@@ -12,7 +12,7 @@ class Users extends Table {
   IntColumn get telegramId => integer().unique()();
   BoolColumn get isAdmin => boolean().withDefault(const Constant(false))();
 
-  TextColumn get name => text().nullable().withLength(min: 2, max: 32)();
+  TextColumn get name => text().nullable().withLength(min: 5, max: 32)();
   TextColumn get groupNumber => text().nullable()();
 }
 
