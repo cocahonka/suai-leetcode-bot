@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:suai_leetcode_bot/data/api/leetcode_api.dart';
@@ -53,8 +54,8 @@ final class HttpLeetCodeRepository {
         body: jsonEncode(data),
       );
 
-      if (response.statusCode != 200) {
-        throw StateError('Error ${response.statusCode}: ${response.body}');
+      if (response.statusCode == 200) {
+        throw HttpException('Error ${response.statusCode}: ${response.body}');
       }
 
       final json = jsonDecode(response.body) as Map<String, dynamic>;
