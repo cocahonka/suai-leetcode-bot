@@ -24,10 +24,22 @@ final class UserScope extends TelegramScope<UserState> {
   String get identificator => 'user_scope';
 
   @override
-  RegExp get commands => RegExp(r'^$');
+  RegExp get commands => RegExp(r'^(\/help|\/info)$');
 
   @override
-  FutureOr<void> callbackOnCommand(Context<Session> context) async {}
+  FutureOr<void> callbackOnCommand(Context<Session> context) async {
+    final command = context.message!.text!;
+
+    if (RegExp('help').hasMatch(command)) {
+      await context.reply(_messages.howItWorks);
+      return;
+    }
+
+    if (RegExp('info').hasMatch(command)) {
+      await context.reply(_messages.howItWorks);
+      return;
+    }
+  }
 
   @override
   bool predicate(Context<Session> context) {

@@ -38,7 +38,7 @@ final class RegisterScope extends TelegramScope<RegisterState> {
   String get identificator => 'register_scope';
 
   @override
-  RegExp get commands => RegExp('start');
+  RegExp get commands => RegExp(r'^\/start$');
 
   @override
   FutureOr<void> callbackOnCommand(Context<Session> context) async {
