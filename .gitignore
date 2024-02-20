@@ -18,6 +18,10 @@ db/
 # Codegen
 *.g.dart
 
+# Logs
+*.log
+*.logs
+
 # dotenv environment variables file
 .env*
 env.*
