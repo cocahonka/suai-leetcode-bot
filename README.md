@@ -19,6 +19,15 @@ The "SUAI Leetcode Bot" is a Telegram bot designed for the sport programming clu
    - Access detailed statistics and insights on problem-solving trends.
    - Export data for record-keeping and detailed analysis.
 
+## Build
+To build and run the SUAI Leetcode Bot:
+1. Clone this repository.
+2. Install the Dart SDK if you haven't already: [Get Dart](https://dart.dev/get-dart)
+3. In the cloned repository's folder, run `build.bat` (for Windows) or `build.sh` (for Linux) as an administrator.
+4. The compiled project will be available in the `build` folder.
+5. In the `build/config` folder, set your Telegram bot token.
+6. The project is now ready to run.
+
 ## Support and Contact
 For support or inquiries about the SUAI Leetcode Bot, please reach out to us via [Telegram](https://t.me/cocahonka).
 
