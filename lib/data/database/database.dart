@@ -124,6 +124,18 @@ class AppDatabase extends _$AppDatabase {
         ]))
       .get();
 
+  Future<List<({Category category, List<LeetCodeTask> tasks})>> get tasksByCategories async {
+    final categories = await allCategories;
+    return Future.wait(
+      List.generate(categories.length, (index) async {
+        return (
+          category: categories[index],
+          tasks: await getTasks(categories[index].id),
+        );
+      }),
+    );
+  }
+
   Future<Category> getCategory(int id) => (select(categories)..where((c) => c.id.equals(id))).getSingle();
 
   Future<List<LeetCodeTask>> getTasks(int categoryId) =>

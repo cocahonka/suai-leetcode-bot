@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
@@ -53,8 +54,11 @@ final class AdminScope extends TelegramScope<AdminState> {
   FutureOr<void> callbackOnMessage(Context<Session> context) async {
     await context.reply(
       'Выберите действие',
-      replyMarkup:
-          InlineKeyboard().add('Выгрузить рейтинг', '${identificator}_${AdminQueryEvent.exportRating.name}').row(),
+      replyMarkup: InlineKeyboard()
+          .add('Выгрузить рейтинг', '${identificator}_${AdminQueryEvent.exportRating.name}')
+          .row()
+          .add('Выгрузить категории', '${identificator}_${AdminQueryEvent.exportCategories.name}')
+          .row(),
     );
   }
 
@@ -72,8 +76,29 @@ final class AdminScope extends TelegramScope<AdminState> {
     switch (queryEvent) {
       case AdminQueryEvent.exportRating:
         await _exportRating(context);
+      case AdminQueryEvent.exportCategories:
+        await _exportCategories(context);
       case null:
     }
+  }
+
+  Future<void> _exportCategories(Context<Session> context) async {
+    final tasksByCategories = await _database.tasksByCategories;
+    final json = <String, List<dynamic>>{'categories': []};
+    for (final (:category, :tasks) in tasksByCategories) {
+      final categoryJson = category.toJson();
+      categoryJson['tasks'] = [...tasks.map((t) => t.toJson())];
+      json['categories']!.add(categoryJson);
+    }
+
+    const jsonEncoder = JsonEncoder.withIndent('  ');
+    const utf8Encoder = Utf8Encoder();
+
+    final bytes = utf8Encoder.convert(jsonEncoder.convert(json));
+
+    await context.replyWithDocument(
+      InputFile.fromBytes(bytes, name: 'Tasks by categories.json'),
+    );
   }
 
   Future<void> _exportRating(Context<Session> context) async {
