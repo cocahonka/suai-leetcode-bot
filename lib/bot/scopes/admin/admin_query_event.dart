@@ -1,5 +1,5 @@
 enum AdminQueryEvent {
-  exportData();
+  exportRating();
 
   const AdminQueryEvent();
 }

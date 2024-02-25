@@ -54,7 +54,7 @@ final class AdminScope extends TelegramScope<AdminState> {
     await context.reply(
       'Выберите действие',
       replyMarkup:
-          InlineKeyboard().add('Выгрузить данные', '${identificator}_${AdminQueryEvent.exportData.name}').row(),
+          InlineKeyboard().add('Выгрузить рейтинг', '${identificator}_${AdminQueryEvent.exportRating.name}').row(),
     );
   }
 
@@ -70,13 +70,13 @@ final class AdminScope extends TelegramScope<AdminState> {
     final queryEvent = AdminQueryEvent.values.firstWhereOrNull((value) => value.name == queryEventIdentificator);
 
     switch (queryEvent) {
-      case AdminQueryEvent.exportData:
-        await _exportData(context);
+      case AdminQueryEvent.exportRating:
+        await _exportRating(context);
       case null:
     }
   }
 
-  Future<void> _exportData(Context<Session> context) async {
+  Future<void> _exportRating(Context<Session> context) async {
     final excel = Excel.createExcel();
     final ratingPerCategory = await _database.getRatingPerCategory();
 
