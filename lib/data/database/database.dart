@@ -194,11 +194,14 @@ class AppDatabase extends _$AppDatabase {
         await (select(leetCodeTasks)..where((lct) => lct.category.equals(cat.id))).get(),
       );
 
+      final categoriesTasksIds = categoriesTasks.last.map((c) => c.id).toList();
+
       usersWithProgress.add(
         await (select(users)
               ..where(
                 (usr) => existsQuery(
-                  select(solvedLeetCodeTasks)..where((slv) => slv.user.equalsExp(usr.id)),
+                  select(solvedLeetCodeTasks)
+                    ..where((slv) => slv.user.equalsExp(usr.id) & slv.task.isIn(categoriesTasksIds)),
                 ),
               ))
             .get(),
@@ -210,7 +213,7 @@ class AppDatabase extends _$AppDatabase {
       final tasks = categoriesTasks[catIndex];
       final tasksIds = tasks.map((t) => t.id).toList();
       final usersSubmissions = await Future.wait(
-        List.generate(usersWithProgress.length, (usrIndex) async {
+        List.generate(usersWithProgress[catIndex].length, (usrIndex) async {
           final userWithProgress = usersWithProgress[catIndex][usrIndex];
           final account = await (select(leetCodeAccounts)
                 ..where((lca) => lca.user.equals(userWithProgress.id))
