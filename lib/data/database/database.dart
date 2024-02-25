@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
 import 'package:sqlite3/sqlite3.dart';
 
@@ -172,6 +173,77 @@ class AppDatabase extends _$AppDatabase {
     }).toList();
   }
 
+  Future<List<CategoryRating>> getRatingPerCategory() async {
+    final nonEmptyCategories = await (select(categories)
+          ..where(
+            (cat) => existsQuery(
+              select(leetCodeTasks)
+                ..where((task) => task.category.equalsExp(cat.id))
+                ..limit(1),
+            ),
+          )
+          ..orderBy([
+            (cat) => OrderingTerm.asc(cat.sortingNumber),
+          ]))
+        .get();
+
+    final categoriesTasks = <List<LeetCodeTask>>[];
+    final usersWithProgress = <List<User>>[];
+    for (final cat in nonEmptyCategories) {
+      categoriesTasks.add(
+        await (select(leetCodeTasks)..where((lct) => lct.category.equals(cat.id))).get(),
+      );
+
+      usersWithProgress.add(
+        await (select(users)
+              ..where(
+                (usr) => existsQuery(
+                  select(solvedLeetCodeTasks)..where((slv) => slv.user.equalsExp(usr.id)),
+                ),
+              ))
+            .get(),
+      );
+    }
+
+    final categoriesRating = <CategoryRating>[];
+    for (final (catIndex, cat) in nonEmptyCategories.indexed) {
+      final tasks = categoriesTasks[catIndex];
+      final tasksIds = tasks.map((t) => t.id).toList();
+      final usersSubmissions = await Future.wait(
+        List.generate(usersWithProgress.length, (usrIndex) async {
+          final userWithProgress = usersWithProgress[catIndex][usrIndex];
+          final account = await (select(leetCodeAccounts)
+                ..where((lca) => lca.user.equals(userWithProgress.id))
+                ..limit(1))
+              .getSingle();
+          final solvedTasks = await (select(solvedLeetCodeTasks)
+                ..where(
+                  (slv) => slv.user.equals(userWithProgress.id) & slv.task.isIn(tasksIds),
+                ))
+              .get();
+          return UserLeetCodeSubmissions(
+            user: userWithProgress,
+            account: account,
+            solvedTasks: solvedTasks,
+          );
+        }),
+      );
+
+      categoriesRating.add(
+        CategoryRating(
+          category: cat,
+          tasks: tasks,
+          usersSubmissions: usersSubmissions
+            ..sort(
+              (a, b) => b.solvedTasks.length.compareTo(a.solvedTasks.length),
+            ),
+        ),
+      );
+    }
+
+    return categoriesRating;
+  }
+
   Future<void> createUserWithLeetCodeAccount({
     required int telegramId,
     required String name,
@@ -194,4 +266,29 @@ class AppDatabase extends _$AppDatabase {
       );
     });
   }
+}
+
+@immutable
+final class CategoryRating {
+  const CategoryRating({
+    required this.category,
+    required this.tasks,
+    required this.usersSubmissions,
+  });
+
+  final Category category;
+  final List<LeetCodeTask> tasks;
+  final List<UserLeetCodeSubmissions> usersSubmissions;
+}
+
+@immutable
+final class UserLeetCodeSubmissions {
+  const UserLeetCodeSubmissions({
+    required this.user,
+    required this.account,
+    required this.solvedTasks,
+  });
+  final User user;
+  final LeetCodeAccount account;
+  final List<SolvedLeetCodeTask> solvedTasks;
 }
