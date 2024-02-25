@@ -96,6 +96,14 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
+  Future<bool> isAdmin(int telegramId) async {
+    final user = await (select(users)
+          ..where((usr) => usr.telegramId.equals(telegramId))
+          ..limit(1))
+        .getSingleOrNull();
+    return user?.isAdmin ?? false;
+  }
+
   Future<bool> isLeetCodeNicknameAlreadyTaken(String leetCodeNickname) async {
     final leetCodeAccount = await (select(leetCodeAccounts)
           ..where((l) => l.nickname.equals(leetCodeNickname))

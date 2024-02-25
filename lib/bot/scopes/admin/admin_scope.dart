@@ -3,8 +3,10 @@ import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:excel/excel.dart';
+import 'package:suai_leetcode_bot/bot/repositories/telegram_state_repository.dart';
 import 'package:suai_leetcode_bot/bot/scopes/admin/admin_query_event.dart';
 import 'package:suai_leetcode_bot/bot/scopes/admin/admin_state.dart';
+import 'package:suai_leetcode_bot/bot/scopes/register/register_state.dart';
 import 'package:suai_leetcode_bot/bot/scopes/telegram_scope.dart';
 import 'package:suai_leetcode_bot/data/database/database.dart';
 import 'package:televerse/televerse.dart';
@@ -13,9 +15,12 @@ final class AdminScope extends TelegramScope<AdminState> {
   const AdminScope({
     required AppDatabase database,
     required super.repository,
-  }) : _database = database;
+    required TelegramStateRepository<RegisterState> registerRepository,
+  })  : _database = database,
+        _registerRepository = registerRepository;
 
   final AppDatabase _database;
+  final TelegramStateRepository<RegisterState> _registerRepository;
 
   @override
   String get identificator => 'admin_scope';
@@ -23,9 +28,16 @@ final class AdminScope extends TelegramScope<AdminState> {
   @override
   RegExp get commands => RegExp(r'^\/admin$');
 
+  Future<bool> _isAdmin(int chatId) async {
+    return _registerRepository.getState(chatId: chatId) is RegisterCompleted && await _database.isAdmin(chatId);
+  }
+
   @override
   FutureOr<void> callbackOnCommand(Context<Session> context) async {
+    final chatId = context.chat!.id;
     final command = context.message!.text!;
+
+    if (!await _isAdmin(chatId)) return;
 
     if (RegExp('admin').hasMatch(command)) {
       await callbackOnMessage(context);
@@ -48,6 +60,9 @@ final class AdminScope extends TelegramScope<AdminState> {
 
   @override
   FutureOr<void> callbackOnQuery(Context<Session> context) async {
+    final chatId = context.chat!.id;
+    if (!await _isAdmin(chatId)) return;
+
     await context.answerCallbackQuery();
 
     final queryData = context.callbackQuery!.data!;
