@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:sqlite3/open.dart' as sqlite;
 import 'package:suai_leetcode_bot/bot/repositories/runtime_repository.dart';
+import 'package:suai_leetcode_bot/bot/scopes/admin/admin_scope.dart';
+import 'package:suai_leetcode_bot/bot/scopes/admin/admin_state.dart';
 import 'package:suai_leetcode_bot/bot/scopes/register/register_scope.dart';
 import 'package:suai_leetcode_bot/bot/scopes/register/register_state.dart';
 import 'package:suai_leetcode_bot/bot/scopes/telegram_scope.dart';
@@ -51,7 +53,12 @@ void main() async {
     onStateComplete: userScope.executeInitialStatePoint,
   );
 
-  final scopes = <TelegramScope<dynamic>>[userScope, registerScope];
+  final adminScope = AdminScope(
+    database: database,
+    repository: RuntimeRepository<AdminState>(initialState: const AdminInitial()),
+  );
+
+  final scopes = <TelegramScope<dynamic>>[userScope, adminScope, registerScope];
 
   TelegramBot(
     config: config,
