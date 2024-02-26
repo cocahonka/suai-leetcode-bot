@@ -213,7 +213,6 @@ final class AdminScope extends TelegramScope<AdminState> {
   Future<void> _cancelCRUD(Context<Session> context) async {
     final chatId = context.chat!.id;
 
-    await context.reply('Действие отменено!');
     repository.setState(chatId: chatId, state: const AdminWork());
 
     await callbackOnMessage(context);

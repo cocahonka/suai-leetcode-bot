@@ -7,6 +7,7 @@ class Config {
     required this.leetCodeUpdateIntervalInSeconds,
     required this.registerMessages,
     required this.userMessages,
+    required this.adminMessages,
   });
 
   factory Config.fromJson(Map<String, dynamic> json) {
@@ -43,6 +44,23 @@ class Config {
             'chooseCategory': final String chooseCategory,
             'taskLinkCaption': final String taskLinkCaption,
             'howItWorks': final String howItWorks,
+          },
+          'admin': {
+            'exportRating': final String exportRating,
+            'exportRatingFilename': final String exportRatingFilename,
+            'exportRatingSaveFail': final String exportRatingSaveFail,
+            'exportRatingUnknownUsername': final String exportRatingUnknownUsername,
+            'exportCategories': final String exportCategories,
+            'exportCategoriesFilename': final String exportCategoriesFilename,
+            'crudCategories': final String crudCategories,
+            'crudCancel': final String crudCancel,
+            'crudInvalidMimeType': final String crudInvalidMimeType,
+            'crudFileDownloadError': final String crudFileDownloadError,
+            'crudFileFormatError': final String crudFileFormatError,
+            'crudDatabaseUnknownError': final String crudDatabaseUnknownError,
+            'crudSuccessful': final String crudSuccessful,
+            'crudHelpMessage': final String crudHelpMessage,
+            'exit': final String exit,
           }
         },
       } =>
@@ -78,6 +96,23 @@ class Config {
             taskLinkCaption: taskLinkCaption,
             howItWorks: howItWorks,
           ),
+          adminMessages: AdminMessages(
+            exportRating: exportRating,
+            exportRatingFilename: exportRatingFilename,
+            exportRatingSaveFail: exportRatingSaveFail,
+            exportRatingUnknownUsername: exportRatingUnknownUsername,
+            exportCategories: exportCategories,
+            exportCategoriesFilename: exportCategoriesFilename,
+            crudCategories: crudCategories,
+            crudCancel: crudCancel,
+            crudInvalidMimeType: crudInvalidMimeType,
+            crudFileDownloadError: crudFileDownloadError,
+            crudFileFormatError: crudFileFormatError,
+            crudDatabaseUnknownError: crudDatabaseUnknownError,
+            crudSuccessful: crudSuccessful,
+            crudHelpMessage: crudHelpMessage,
+            exit: exit,
+          ),
         ),
       _ => throw const FormatException('The configuration file does not match the template')
     };
@@ -87,6 +122,7 @@ class Config {
   final int leetCodeUpdateIntervalInSeconds;
   final RegisterMessages registerMessages;
   final UserMessages userMessages;
+  final AdminMessages adminMessages;
 }
 
 sealed class Messages {
@@ -153,4 +189,40 @@ class UserMessages extends Messages {
   final String chooseCategory;
   final String taskLinkCaption;
   final String howItWorks;
+}
+
+class AdminMessages extends Messages {
+  AdminMessages({
+    required this.exportRating,
+    required this.exportRatingFilename,
+    required this.exportRatingSaveFail,
+    required this.exportRatingUnknownUsername,
+    required this.exportCategories,
+    required this.exportCategoriesFilename,
+    required this.crudCategories,
+    required this.crudCancel,
+    required this.crudInvalidMimeType,
+    required this.crudFileDownloadError,
+    required this.crudFileFormatError,
+    required this.crudDatabaseUnknownError,
+    required this.crudSuccessful,
+    required this.crudHelpMessage,
+    required this.exit,
+  });
+
+  final String exportRating;
+  final String exportRatingFilename;
+  final String exportRatingSaveFail;
+  final String exportRatingUnknownUsername;
+  final String exportCategories;
+  final String exportCategoriesFilename;
+  final String crudCategories;
+  final String crudCancel;
+  final String crudInvalidMimeType;
+  final String crudFileDownloadError;
+  final String crudFileFormatError;
+  final String crudDatabaseUnknownError;
+  final String crudSuccessful;
+  final String crudHelpMessage;
+  final String exit;
 }
