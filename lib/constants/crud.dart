@@ -3,16 +3,16 @@
 final Map<String, dynamic> kCrudEmpty = {
   'categories': {
     'operations': {
-      'create': [{}],
-      'update': [{}],
-      'delete': [{}],
+      'create': [],
+      'update': [],
+      'delete': [],
     },
   },
   'tasks': {
     'operations': {
-      'create': [{}],
-      'update': [{}],
-      'delete': [{}],
+      'create': [],
+      'update': [],
+      'delete': [],
     },
   },
 };
