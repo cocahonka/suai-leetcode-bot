@@ -55,6 +55,7 @@ void main() async {
 
   final adminScope = AdminScope(
     database: database,
+    messages: config.adminMessages,
     repository: RuntimeRepository<AdminState>(initialState: const AdminInitial()),
     registerRepository: registerRepository,
     onStateComplete: userScope.executeInitialStatePoint,

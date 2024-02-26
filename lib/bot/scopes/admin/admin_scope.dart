@@ -9,6 +9,7 @@ import 'package:suai_leetcode_bot/bot/scopes/admin/admin_query_event.dart';
 import 'package:suai_leetcode_bot/bot/scopes/admin/admin_state.dart';
 import 'package:suai_leetcode_bot/bot/scopes/register/register_state.dart';
 import 'package:suai_leetcode_bot/bot/scopes/telegram_scope.dart';
+import 'package:suai_leetcode_bot/config/config.dart';
 import 'package:suai_leetcode_bot/constants/crud.dart';
 import 'package:suai_leetcode_bot/data/database/database.dart';
 import 'package:suai_leetcode_bot/service/logger_service.dart';
@@ -18,13 +19,16 @@ import 'package:televerse/televerse.dart';
 final class AdminScope extends TelegramScope<AdminState> {
   const AdminScope({
     required AppDatabase database,
+    required AdminMessages messages,
+    required TelegramStateRepository<RegisterState> registerRepository,
     required super.repository,
     required super.onStateComplete,
-    required TelegramStateRepository<RegisterState> registerRepository,
   })  : _database = database,
+        _messages = messages,
         _registerRepository = registerRepository;
 
   final AppDatabase _database;
+  final AdminMessages _messages;
   final TelegramStateRepository<RegisterState> _registerRepository;
 
   @override

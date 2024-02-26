@@ -31,7 +31,7 @@ class Config {
             'leetCodeNicknameGetError': final String leetCodeNicknameGetError,
           },
           'user': {
-            'chooseMenuItem': final String chooseMenuItem,
+            'chooseMenuItem': final String $userChooseMenuItem,
             'aboutClubCaption': final String aboutClubCaption,
             'aboutClubLink': final String aboutClubLink,
             'olympiadsCaption': final String olympiadsCaption,
@@ -46,6 +46,7 @@ class Config {
             'howItWorks': final String howItWorks,
           },
           'admin': {
+            'chooseMenuItem': final String $adminChooseMenuItem,
             'exportRating': final String exportRating,
             'exportRatingFilename': final String exportRatingFilename,
             'exportRatingSaveFail': final String exportRatingSaveFail,
@@ -82,7 +83,7 @@ class Config {
             leetCodeNicknameGetError: leetCodeNicknameGetError,
           ),
           userMessages: UserMessages(
-            chooseMenuItem: chooseMenuItem,
+            chooseMenuItem: $userChooseMenuItem,
             aboutClubCaption: aboutClubCaption,
             aboutClubLink: aboutClubLink,
             olympiadsCaption: olympiadsCaption,
@@ -97,6 +98,7 @@ class Config {
             howItWorks: howItWorks,
           ),
           adminMessages: AdminMessages(
+            chooseMenuItem: $adminChooseMenuItem,
             exportRating: exportRating,
             exportRatingFilename: exportRatingFilename,
             exportRatingSaveFail: exportRatingSaveFail,
@@ -193,6 +195,7 @@ class UserMessages extends Messages {
 
 class AdminMessages extends Messages {
   AdminMessages({
+    required this.chooseMenuItem,
     required this.exportRating,
     required this.exportRatingFilename,
     required this.exportRatingSaveFail,
@@ -210,6 +213,7 @@ class AdminMessages extends Messages {
     required this.exit,
   });
 
+  final String chooseMenuItem;
   final String exportRating;
   final String exportRatingFilename;
   final String exportRatingSaveFail;
