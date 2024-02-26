@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:suai_leetcode_bot/bot/scopes/telegram_scope.dart';
 import 'package:suai_leetcode_bot/config/config.dart';
 import 'package:suai_leetcode_bot/service/logger_service.dart';
@@ -15,26 +17,26 @@ class TelegramBot {
   final Bot _bot;
 
   void start() {
-    _bot
-      ..onError((err) {
-        LoggerService().writeError(err.error, err.stackTrace);
-        // ignore: avoid_print
-        print('Error ${err.error}, with stackTrace ${err.stackTrace}');
-      })
-      ..start();
-    for (final TelegramScope(
-          :commands,
-          :callbackOnCommand,
-          :predicate,
-          :callbackOnMessage,
-          :identificator,
-          :queryPattern,
-          :callbackOnQuery,
-        ) in _scopes) {
-      _bot
-        ..command(commands, callbackOnCommand)
-        ..filter(predicate, callbackOnMessage, name: identificator)
-        ..callbackQuery(queryPattern, callbackOnQuery);
-    }
+    runZonedGuarded(() {
+      _bot.start();
+      for (final TelegramScope(
+            :commands,
+            :callbackOnCommand,
+            :predicate,
+            :callbackOnMessage,
+            :identificator,
+            :queryPattern,
+            :callbackOnQuery,
+          ) in _scopes) {
+        _bot
+          ..command(commands, callbackOnCommand)
+          ..filter(predicate, callbackOnMessage, name: identificator)
+          ..callbackQuery(queryPattern, callbackOnQuery);
+      }
+    }, (error, stack) {
+      LoggerService().writeError(error, stack);
+      // ignore: avoid_print
+      print('Error $error, with stackTrace $stack');
+    });
   }
 }
