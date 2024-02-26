@@ -1,7 +1,9 @@
 enum AdminQueryEvent {
   exportRating(),
   exportCategories(),
-  requestCRUD();
+  requestCRUD(),
+  cancelCRUD(),
+  exit();
 
   const AdminQueryEvent();
 }

@@ -57,6 +57,7 @@ void main() async {
     database: database,
     repository: RuntimeRepository<AdminState>(initialState: const AdminInitial()),
     registerRepository: registerRepository,
+    onStateComplete: userScope.executeInitialStatePoint,
   );
 
   final scopes = <TelegramScope<dynamic>>[userScope, adminScope, registerScope];

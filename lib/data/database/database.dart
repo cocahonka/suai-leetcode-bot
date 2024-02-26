@@ -5,6 +5,7 @@ import 'package:drift/native.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
 import 'package:sqlite3/sqlite3.dart';
+import 'package:suai_leetcode_bot/bot/scopes/admin/admin_scope.dart';
 
 part 'database.g.dart';
 
@@ -45,7 +46,7 @@ enum LeetCodeTaskComplexity {
 class LeetCodeTasks extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get slug => text().unique()();
-  IntColumn get category => integer().references(Categories, #id)();
+  IntColumn get category => integer().references(Categories, #id, onDelete: KeyAction.cascade)();
   TextColumn get title => text().withLength(min: 1, max: 128)();
   TextColumn get link => text().withLength(min: 1, max: 512)();
   TextColumn get complexity => textEnum<LeetCodeTaskComplexity>()();
@@ -54,7 +55,7 @@ class LeetCodeTasks extends Table {
 class SolvedLeetCodeTasks extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get user => integer().references(Users, #id)();
-  IntColumn get task => integer().references(LeetCodeTasks, #id)();
+  IntColumn get task => integer().references(LeetCodeTasks, #id, onDelete: KeyAction.cascade)();
   DateTimeColumn get date => dateTime()();
 }
 
@@ -288,6 +289,120 @@ class AppDatabase extends _$AppDatabase {
         ),
       );
     });
+  }
+
+  Future<(Object e, StackTrace s)?> processCRUD(CRUDOperations operations) async {
+    try {
+      await transaction<void>(() async {
+        final (categories: categoriesOperations, tasks: tasksOperations) = operations;
+
+        for (final categoryCreate in categoriesOperations.create) {
+          categoryCreate as Map<String, dynamic>;
+          final title = categoryCreate['title'] as String;
+          final shortTitle = categoryCreate['short_title'] as String;
+          final description = categoryCreate['description'] as String;
+          final sortingNumber = categoryCreate['sorting_number'] as int;
+
+          await into(categories).insert(
+            CategoriesCompanion.insert(
+              title: title,
+              shortTitle: shortTitle,
+              description: description,
+              sortingNumber: sortingNumber,
+              deadline: DateTime.fromMillisecondsSinceEpoch(0),
+            ),
+          );
+        }
+
+        for (final categoryUpdate in categoriesOperations.update) {
+          categoryUpdate as Map<String, dynamic>;
+          final id = categoryUpdate['id'] as int;
+          final title = categoryUpdate['title'] as String?;
+          final shortTitle = categoryUpdate['short_title'] as String?;
+          final description = categoryUpdate['description'] as String?;
+          final sortingNumber = categoryUpdate['sorting_number'] as int?;
+
+          final oldValue = await (select(categories)
+                ..where((c) => c.id.equals(id))
+                ..limit(1))
+              .getSingle();
+
+          final newValue = oldValue.copyWith(
+            title: title,
+            shortTitle: shortTitle,
+            description: description,
+            sortingNumber: sortingNumber,
+          );
+
+          await update(categories).replace(newValue);
+        }
+
+        for (final categoryDelete in categoriesOperations.delete) {
+          categoryDelete as Map<String, dynamic>;
+          final id = categoryDelete['id'] as int;
+
+          await (delete(categories)..where((c) => c.id.equals(id))).go();
+        }
+
+        for (final taskCreate in tasksOperations.create) {
+          taskCreate as Map<String, dynamic>;
+          final slug = taskCreate['slug'] as String;
+          final category = taskCreate['category'] as int;
+          final title = taskCreate['title'] as String;
+          final link = taskCreate['link'] as String;
+          final complexity = taskCreate['complexity'] as String;
+
+          await into(leetCodeTasks).insert(
+            LeetCodeTasksCompanion.insert(
+              slug: slug,
+              category: category,
+              title: title,
+              link: link,
+              complexity: LeetCodeTaskComplexity.values.firstWhere(
+                (e) => e.name.toLowerCase() == complexity.toLowerCase(),
+              ),
+            ),
+          );
+        }
+
+        for (final taskUpdate in tasksOperations.update) {
+          taskUpdate as Map<String, dynamic>;
+          final slug = taskUpdate['slug'] as String;
+          final category = taskUpdate['category'] as int?;
+          final title = taskUpdate['title'] as String?;
+          final link = taskUpdate['link'] as String?;
+          final complexity = taskUpdate['complexity'] as String?;
+
+          final oldValue = await (select(leetCodeTasks)
+                ..where((l) => l.slug.equals(slug))
+                ..limit(1))
+              .getSingle();
+
+          final newValue = oldValue.copyWith(
+            category: category,
+            title: title,
+            link: link,
+            complexity: complexity == null
+                ? null
+                : LeetCodeTaskComplexity.values.firstWhere(
+                    (e) => e.name.toLowerCase() == complexity.toLowerCase(),
+                  ),
+          );
+
+          await update(leetCodeTasks).replace(newValue);
+        }
+
+        for (final taskDelete in tasksOperations.delete) {
+          taskDelete as Map<String, dynamic>;
+          final slug = taskDelete['slug'] as String;
+
+          await (delete(leetCodeTasks)..where((l) => l.slug.equals(slug))).go();
+        }
+      });
+    } on Object catch (e, s) {
+      return (e, s);
+    }
+    return null;
   }
 }
 
