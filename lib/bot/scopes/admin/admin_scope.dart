@@ -58,6 +58,8 @@ final class AdminScope extends TelegramScope<AdminState> {
           .add('Выгрузить рейтинг', '${identificator}_${AdminQueryEvent.exportRating.name}')
           .row()
           .add('Выгрузить категории', '${identificator}_${AdminQueryEvent.exportCategories.name}')
+          .row()
+          .add('Внести изменения', '${identificator}_${AdminQueryEvent.requestCRUD.name}')
           .row(),
     );
   }
@@ -78,9 +80,13 @@ final class AdminScope extends TelegramScope<AdminState> {
         await _exportRating(context);
       case AdminQueryEvent.exportCategories:
         await _exportCategories(context);
+      case AdminQueryEvent.requestCRUD:
+        await _requestCRUD(context);
       case null:
     }
   }
+
+  Future<void> _requestCRUD(Context<Session> context) async {}
 
   Future<void> _exportCategories(Context<Session> context) async {
     final tasksByCategories = await _database.tasksByCategories;
