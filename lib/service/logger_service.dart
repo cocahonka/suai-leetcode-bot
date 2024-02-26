@@ -16,7 +16,7 @@ final class LoggerService {
     return logsFile;
   }
 
-  void writeError(Exception e, StackTrace s) {
+  void writeError(Object e, StackTrace s) {
     final buffer = StringBuffer()
       ..writeln('${"-" * 10} BEGIN OF ERROR ${"-" * 10}')
       ..writeln('Error $e with StackTrace $s')

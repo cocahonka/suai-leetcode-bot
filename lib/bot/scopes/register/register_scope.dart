@@ -42,6 +42,8 @@ final class RegisterScope extends TelegramScope<RegisterState> {
 
   @override
   FutureOr<void> callbackOnCommand(Context<Session> context) async {
+    if (context.chat?.isForum ?? false) return;
+
     final chatId = context.chat!.id;
     final command = context.message!.text!;
     final state = repository.getState(chatId: chatId);
@@ -57,6 +59,8 @@ final class RegisterScope extends TelegramScope<RegisterState> {
 
   @override
   bool predicate(Context<Session> context) {
+    if (context.chat?.isForum ?? false) return false;
+
     final chatId = context.chat?.id;
     final message = context.message;
 
@@ -82,6 +86,8 @@ final class RegisterScope extends TelegramScope<RegisterState> {
 
   @override
   FutureOr<void> callbackOnQuery(Context<Session> context) async {
+    if (context.chat?.isForum ?? false) return;
+
     final chatId = context.chat!.id;
     final state = repository.getState(chatId: chatId);
 

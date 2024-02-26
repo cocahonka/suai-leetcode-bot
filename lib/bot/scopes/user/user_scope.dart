@@ -28,6 +28,8 @@ final class UserScope extends TelegramScope<UserState> {
 
   @override
   FutureOr<void> callbackOnCommand(Context<Session> context) async {
+    if (context.chat?.isForum ?? false) return;
+
     final command = context.message!.text!;
 
     if (RegExp('help').hasMatch(command)) {
@@ -43,6 +45,8 @@ final class UserScope extends TelegramScope<UserState> {
 
   @override
   bool predicate(Context<Session> context) {
+    if (context.chat?.isForum ?? false) return false;
+
     final chatId = context.chat?.id;
     final message = context.message;
 
@@ -69,6 +73,8 @@ final class UserScope extends TelegramScope<UserState> {
 
   @override
   FutureOr<void> callbackOnQuery(Context<Session> context) async {
+    if (context.chat?.isForum ?? false) return;
+
     await context.answerCallbackQuery();
 
     final queryData = context.callbackQuery!.data!;

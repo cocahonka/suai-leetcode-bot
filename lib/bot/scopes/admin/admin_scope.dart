@@ -43,6 +43,8 @@ final class AdminScope extends TelegramScope<AdminState> {
 
   @override
   FutureOr<void> callbackOnCommand(Context<Session> context) async {
+    if (context.chat?.isForum ?? false) return;
+
     final chatId = context.chat!.id;
     final command = context.message!.text!;
 
@@ -56,6 +58,8 @@ final class AdminScope extends TelegramScope<AdminState> {
 
   @override
   bool predicate(Context<Session> context) {
+    if (context.chat?.isForum ?? false) return false;
+
     final chatId = context.chat?.id;
     final message = context.message;
 
@@ -91,6 +95,8 @@ final class AdminScope extends TelegramScope<AdminState> {
 
   @override
   FutureOr<void> callbackOnQuery(Context<Session> context) async {
+    if (context.chat?.isForum ?? false) return;
+
     final chatId = context.chat!.id;
     if (!await _isAdmin(chatId)) return;
 
