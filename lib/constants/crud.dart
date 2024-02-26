@@ -23,18 +23,18 @@ const Map<String, dynamic> kCrudExample = {
       'create': [
         {
           'title': 'Неделя 1: Сортировка',
-          'short_title': 'Сортировка',
+          'shortTitle': 'Сортировка',
           'description': 'example description',
-          'sorting_number': 1,
+          'sortingNumber': 1,
         }
       ],
       'update': [
         {
           'id': 0,
           'title': 'example title',
-          'short_title': 'example short_title',
+          'shortTitle': 'example shortTitle',
           'description': 'example description',
-          'sorting_number': 1,
+          'sortingNumber': 1,
         }
       ],
       'delete': [

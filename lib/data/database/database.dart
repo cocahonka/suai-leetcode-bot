@@ -299,9 +299,9 @@ class AppDatabase extends _$AppDatabase {
         for (final categoryCreate in categoriesOperations.create) {
           categoryCreate as Map<String, dynamic>;
           final title = categoryCreate['title'] as String;
-          final shortTitle = categoryCreate['short_title'] as String;
+          final shortTitle = categoryCreate['shortTitle'] as String;
           final description = categoryCreate['description'] as String;
-          final sortingNumber = categoryCreate['sorting_number'] as int;
+          final sortingNumber = categoryCreate['sortingNumber'] as int;
 
           await into(categories).insert(
             CategoriesCompanion.insert(
@@ -318,9 +318,9 @@ class AppDatabase extends _$AppDatabase {
           categoryUpdate as Map<String, dynamic>;
           final id = categoryUpdate['id'] as int;
           final title = categoryUpdate['title'] as String?;
-          final shortTitle = categoryUpdate['short_title'] as String?;
+          final shortTitle = categoryUpdate['shortTitle'] as String?;
           final description = categoryUpdate['description'] as String?;
-          final sortingNumber = categoryUpdate['sorting_number'] as int?;
+          final sortingNumber = categoryUpdate['sortingNumber'] as int?;
 
           final oldValue = await (select(categories)
                 ..where((c) => c.id.equals(id))
