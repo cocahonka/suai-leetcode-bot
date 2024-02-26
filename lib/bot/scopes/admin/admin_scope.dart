@@ -74,15 +74,15 @@ final class AdminScope extends TelegramScope<AdminState> {
         await _takeCRUDForm(context);
       case AdminWork():
         await context.reply(
-          'Выберите действие',
+          _messages.chooseMenuItem,
           replyMarkup: InlineKeyboard()
-              .add('Выгрузить рейтинг', '${identificator}_${AdminQueryEvent.exportRating.name}')
+              .add(_messages.exportRating, '${identificator}_${AdminQueryEvent.exportRating.name}')
               .row()
-              .add('Выгрузить категории', '${identificator}_${AdminQueryEvent.exportCategories.name}')
+              .add(_messages.exportCategories, '${identificator}_${AdminQueryEvent.exportCategories.name}')
               .row()
-              .add('Внести изменения', '${identificator}_${AdminQueryEvent.requestCRUD.name}')
+              .add(_messages.crudCategories, '${identificator}_${AdminQueryEvent.requestCRUD.name}')
               .row()
-              .add('Выход', '${identificator}_${AdminQueryEvent.exit.name}')
+              .add(_messages.exit, '${identificator}_${AdminQueryEvent.exit.name}')
               .row(),
         );
       case AdminInitial():
@@ -121,8 +121,13 @@ final class AdminScope extends TelegramScope<AdminState> {
 
     if (document == null && document?.mimeType != 'application/json') {
       await context.reply(
-        'Нужно прислать файл .json, попробуйте еще раз!',
-        replyMarkup: InlineKeyboard().add('Назад', '${identificator}_${AdminQueryEvent.cancelCRUD.name}').row(),
+        _messages.crudInvalidMimeType,
+        replyMarkup: InlineKeyboard()
+            .add(
+              _messages.crudCancel,
+              '${identificator}_${AdminQueryEvent.cancelCRUD.name}',
+            )
+            .row(),
       );
       return;
     }
@@ -139,7 +144,7 @@ final class AdminScope extends TelegramScope<AdminState> {
       json = jsonDecoder.convert(fileContent) as Map<String, dynamic>;
     } on Exception catch (e, s) {
       LoggerService().writeError(e, s);
-      await context.reply('Произошла ошибка при скачивании файла');
+      await context.reply(_messages.crudFileDownloadError);
       repository.setState(chatId: chatId, state: const AdminWork());
       callbackOnMessage(context);
       return;
@@ -149,24 +154,31 @@ final class AdminScope extends TelegramScope<AdminState> {
 
     if (operations == null) {
       await context.reply(
-        'Файл не соответсвует формату example.json или не выполнены условия из правил, попробуйте еще раз!',
-        replyMarkup: InlineKeyboard().add('Назад', '${identificator}_${AdminQueryEvent.cancelCRUD.name}').row(),
+        _messages.crudFileFormatError,
+        replyMarkup:
+            InlineKeyboard().add(_messages.crudCancel, '${identificator}_${AdminQueryEvent.cancelCRUD.name}').row(),
       );
       return;
     }
 
     final result = await _database.processCRUD(operations);
     if (result != null) {
-      await context.reply(
-        'Произошла ошибка: ${result.$1}\n, попробуйте еще раз',
-        replyMarkup: InlineKeyboard().add('Назад', '${identificator}_${AdminQueryEvent.cancelCRUD.name}').row(),
-      );
       final (e, s) = result;
+      await context.reply(
+        _messages.crudDatabaseUnknownError.replaceFirst(r'$', e.toString()),
+        replyMarkup: InlineKeyboard()
+            .add(
+              _messages.crudCancel,
+              '${identificator}_${AdminQueryEvent.cancelCRUD.name}',
+            )
+            .row(),
+      );
+
       LoggerService().writeError(e is Exception ? e : Exception(e), s);
       return;
     }
 
-    await context.reply('Изменения успешно внесены!');
+    await context.reply(_messages.crudSuccessful);
     repository.setState(chatId: chatId, state: const AdminWork());
     callbackOnMessage(context);
   }
@@ -229,18 +241,17 @@ final class AdminScope extends TelegramScope<AdminState> {
 
     final exampleCrudBytes = utf8Encoder.convert(jsonEncoder.convert(kCrudExample));
     final emptyCrudBytes = utf8Encoder.convert(jsonEncoder.convert(kCrudEmpty));
-    const message = '''
-Если вы хотите внести изменения в категории или задачи то отправьте заполненный json файл или отмените операцию.
 
-Правила:
-1. В прикрепленном файле (example.json) содержится пример заполнения изменений.
-2. В прикрепленном файле (form.json) содержится форма для заполнения.
-3. При создании следует указать все поля.
-4. При обновлении следует следует указать id или slug, другие поля опциональны.
-5. При удалении следует указать только id или slug
-6. При создании заданий необходимо знать id категории, для этого сначала создайте категорию, а потом выгрузите категорию, в выгруженном файле будут id категорий.''';
+    await context.reply(
+      _messages.crudHelpMessage,
+      replyMarkup: InlineKeyboard()
+          .add(
+            _messages.crudCancel,
+            '${identificator}_${AdminQueryEvent.cancelCRUD.name}',
+          )
+          .row(),
+    );
 
-    await context.reply(message);
     await context.replyWithMediaGroup(
       [
         InputMediaDocument(media: InputFile.fromBytes(exampleCrudBytes, name: 'example.json')),
@@ -248,6 +259,7 @@ final class AdminScope extends TelegramScope<AdminState> {
       ],
       protectContent: true,
     );
+
     repository.setState(chatId: chatId, state: const AdminWaitForCRUD());
   }
 
@@ -269,7 +281,13 @@ final class AdminScope extends TelegramScope<AdminState> {
     final bytes = utf8Encoder.convert(jsonEncoder.convert(json));
 
     await context.replyWithDocument(
-      InputFile.fromBytes(bytes, name: 'Tasks by categories.json'),
+      InputFile.fromBytes(
+        bytes,
+        name: _messages.exportCategoriesFilename.replaceFirst(
+          r'$',
+          DateTime.now().toString().split(' ').first,
+        ),
+      ),
     );
   }
 
@@ -298,7 +316,7 @@ final class AdminScope extends TelegramScope<AdminState> {
       for (final (index, submissions) in usersSubmissions.indexed) {
         sheet.appendRow([
           TextCellValue('${index + 1}'),
-          TextCellValue(submissions.user.name ?? 'unknown'),
+          TextCellValue(submissions.user.name ?? _messages.exportRatingUnknownUsername),
           TextCellValue(submissions.account.nickname),
           ...[
             for (final _ in submissions.solvedTasks) const TextCellValue('+'),
@@ -309,14 +327,17 @@ final class AdminScope extends TelegramScope<AdminState> {
 
     final bytes = excel.save();
     if (bytes == null) {
-      await context.reply('Не удалось составить таблицу, сообщите об этом Булату');
+      await context.reply(_messages.exportRatingSaveFail);
       return;
     }
 
     await context.replyWithDocument(
       InputFile.fromBytes(
         Uint8List.fromList(bytes),
-        name: 'Data by ${DateTime.now()}.xlsx',
+        name: _messages.exportRatingFilename.replaceFirst(
+          r'$',
+          DateTime.now().toString().split(' ').first,
+        ),
       ),
     );
   }
