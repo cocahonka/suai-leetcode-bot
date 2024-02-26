@@ -1,6 +1,6 @@
 // ignore_for_file: inference_failure_on_collection_literal
 
-final Map<String, dynamic> kCrudEmpty = {
+const Map<String, dynamic> kCrudEmpty = {
   'categories': {
     'operations': {
       'create': [],
@@ -17,7 +17,7 @@ final Map<String, dynamic> kCrudEmpty = {
   },
 };
 
-final Map<String, dynamic> kCrudExample = {
+const Map<String, dynamic> kCrudExample = {
   'categories': {
     'operations': {
       'create': [
