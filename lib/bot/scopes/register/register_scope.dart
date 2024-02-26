@@ -29,7 +29,7 @@ final class RegisterScope extends TelegramScope<RegisterState> {
 
   late final InlineKeyboard _restartKeyboard = InlineKeyboard()
       .add(
-        _messages.restartRegistration,
+        'Начать с начала',
         '${identificator}_${RegisterQueryEvent.restart.name}',
       )
       .row();
