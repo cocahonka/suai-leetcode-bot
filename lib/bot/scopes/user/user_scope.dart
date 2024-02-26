@@ -126,7 +126,6 @@ final class UserScope extends TelegramScope<UserState> {
       content
         ..write(taskMarker)
         ..write(' ${task.complexity.cutName}')
-        ..write(' ${task.id}')
         ..write(' ${task.title}')
         ..write(' <a href="${task.link}">${_messages.taskLinkCaption}</a>')
         ..writeln();
