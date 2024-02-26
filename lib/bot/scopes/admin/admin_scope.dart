@@ -250,11 +250,14 @@ final class AdminScope extends TelegramScope<AdminState> {
 
   Future<void> _exportCategories(Context<Session> context) async {
     final tasksByCategories = await _database.tasksByCategories;
-    final json = <String, List<dynamic>>{'categories': []};
+    final json = jsonDecode(jsonEncode(kCrudEmpty)) as Map<String, dynamic>;
+
     for (final (:category, :tasks) in tasksByCategories) {
       final categoryJson = category.toJson();
-      categoryJson['tasks'] = [...tasks.map((t) => t.toJson())];
-      json['categories']!.add(categoryJson);
+      // ignore: avoid_dynamic_calls
+      json['categories']['operations']['create'].add(categoryJson);
+      // ignore: avoid_dynamic_calls
+      json['tasks']['operations']['create'].addAll(tasks.map((t) => t.toJson()));
     }
 
     const jsonEncoder = JsonEncoder.withIndent('  ');
