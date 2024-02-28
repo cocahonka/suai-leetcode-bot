@@ -48,7 +48,8 @@ final class UserScope extends TelegramScope<UserState> {
 
     if (RegExp('update').hasMatch(command)) {
       if (nextTimerRun case final time?) {
-        final (hour, minute) = (time.hour, time.minute);
+        final localDate = _convertToTimeZoneUsingUnixTime(time, context.message!.dateTime);
+        final (hour, minute) = (localDate.hour, localDate.minute);
         await context.reply(_messages.whenNextUpdate.replaceFirst(r'$', 'в $hour:$minute'));
         return;
       }
@@ -164,5 +165,14 @@ final class UserScope extends TelegramScope<UserState> {
   @override
   FutureOr<void> executeInitialStatePoint(Context<Session> context) async {
     await callbackOnMessage(context);
+  }
+
+  DateTime _convertToTimeZoneUsingUnixTime(DateTime dateTimeToConvert, DateTime referenceDateTime) {
+    final unixTimeToConvert = dateTimeToConvert.toUtc().millisecondsSinceEpoch ~/ 1000;
+    final unixTimeReference = referenceDateTime.toUtc().millisecondsSinceEpoch ~/ 1000;
+
+    final timeZoneDifferenceInSeconds = unixTimeReference - unixTimeToConvert;
+
+    return DateTime.fromMillisecondsSinceEpoch((unixTimeToConvert + timeZoneDifferenceInSeconds) * 1000);
   }
 }
