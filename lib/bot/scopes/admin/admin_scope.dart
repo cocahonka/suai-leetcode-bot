@@ -315,7 +315,7 @@ final class AdminScope extends TelegramScope<AdminState> {
       for (final (index, leetCodeTask) in tasks.indexed) {
         sheet.updateCell(
           CellIndex.indexByColumnRow(columnIndex: index + 3, rowIndex: 1),
-          TextCellValue('${leetCodeTask.complexity.cutName}. ${leetCodeTask.id}. ${leetCodeTask.title}'),
+          TextCellValue('${leetCodeTask.complexity.cutName} ${leetCodeTask.title}'),
         );
       }
 
