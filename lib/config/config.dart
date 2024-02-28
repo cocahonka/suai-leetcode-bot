@@ -44,6 +44,7 @@ class Config {
             'chooseCategory': final String chooseCategory,
             'taskLinkCaption': final String taskLinkCaption,
             'howItWorks': final String howItWorks,
+            'whenNextUpdate': final String whenNextUpdate,
           },
           'admin': {
             'chooseMenuItem': final String $adminChooseMenuItem,
@@ -96,6 +97,7 @@ class Config {
             chooseCategory: chooseCategory,
             taskLinkCaption: taskLinkCaption,
             howItWorks: howItWorks,
+            whenNextUpdate: whenNextUpdate,
           ),
           adminMessages: AdminMessages(
             chooseMenuItem: $adminChooseMenuItem,
@@ -176,6 +178,7 @@ class UserMessages extends Messages {
     required this.chooseCategory,
     required this.taskLinkCaption,
     required this.howItWorks,
+    required this.whenNextUpdate,
   });
 
   final String chooseMenuItem;
@@ -191,6 +194,7 @@ class UserMessages extends Messages {
   final String chooseCategory;
   final String taskLinkCaption;
   final String howItWorks;
+  final String whenNextUpdate;
 }
 
 class AdminMessages extends Messages {

@@ -315,18 +315,25 @@ final class AdminScope extends TelegramScope<AdminState> {
       for (final (index, leetCodeTask) in tasks.indexed) {
         sheet.updateCell(
           CellIndex.indexByColumnRow(columnIndex: index + 3, rowIndex: 1),
-          TextCellValue('${leetCodeTask.complexity.cutName}. ${leetCodeTask.id}. ${leetCodeTask.title}'),
+          TextCellValue('${leetCodeTask.complexity.cutName} ${leetCodeTask.title}'),
         );
       }
 
       for (final (index, submissions) in usersSubmissions.indexed) {
+        final markers = <TextCellValue>[];
+        for (final leetCodeTask in tasks) {
+          final isSolved = submissions.solvedTasks.any((solvedTask) {
+            return leetCodeTask.id == solvedTask.task;
+          });
+
+          markers.add(isSolved ? const TextCellValue('+') : const TextCellValue(''));
+        }
+
         sheet.appendRow([
           TextCellValue('${index + 1}'),
           TextCellValue(submissions.user.name ?? _messages.exportRatingUnknownUsername),
           TextCellValue(submissions.account.nickname),
-          ...[
-            for (final _ in submissions.solvedTasks) const TextCellValue('+'),
-          ],
+          ...markers,
         ]);
       }
     }
