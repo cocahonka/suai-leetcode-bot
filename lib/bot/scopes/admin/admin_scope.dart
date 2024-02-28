@@ -320,13 +320,20 @@ final class AdminScope extends TelegramScope<AdminState> {
       }
 
       for (final (index, submissions) in usersSubmissions.indexed) {
+        final markers = <TextCellValue>[];
+        for (final leetCodeTask in tasks) {
+          final isSolved = submissions.solvedTasks.any((solvedTask) {
+            return leetCodeTask.id == solvedTask.task;
+          });
+
+          markers.add(isSolved ? const TextCellValue('+') : const TextCellValue(''));
+        }
+
         sheet.appendRow([
           TextCellValue('${index + 1}'),
           TextCellValue(submissions.user.name ?? _messages.exportRatingUnknownUsername),
           TextCellValue(submissions.account.nickname),
-          ...[
-            for (final _ in submissions.solvedTasks) const TextCellValue('+'),
-          ],
+          ...markers,
         ]);
       }
     }
