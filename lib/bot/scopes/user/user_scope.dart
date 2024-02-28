@@ -6,6 +6,7 @@ import 'package:suai_leetcode_bot/bot/scopes/user/user_query_event.dart';
 import 'package:suai_leetcode_bot/bot/scopes/user/user_state.dart';
 import 'package:suai_leetcode_bot/config/config.dart';
 import 'package:suai_leetcode_bot/data/database/database.dart';
+import 'package:suai_leetcode_bot/service/leetcode_service.dart';
 import 'package:televerse/telegram.dart';
 import 'package:televerse/televerse.dart';
 
@@ -15,16 +16,19 @@ final class UserScope extends TelegramScope<UserState> {
     required UserMessages messages,
     required super.repository,
   })  : _database = database,
-        _messages = messages;
+        _messages = messages {
+    LeetCodeService.nextTimerRun.listen((time) => nextTimerRun = time);
+  }
 
   final AppDatabase _database;
   final UserMessages _messages;
+  DateTime? nextTimerRun;
 
   @override
   String get identificator => 'user_scope';
 
   @override
-  RegExp get commands => RegExp(r'^(\/help|\/info)$');
+  RegExp get commands => RegExp(r'^(\/help|\/info|\/update)$');
 
   @override
   FutureOr<void> callbackOnCommand(Context<Session> context) async {
@@ -39,6 +43,18 @@ final class UserScope extends TelegramScope<UserState> {
 
     if (RegExp('info').hasMatch(command)) {
       await context.reply(_messages.howItWorks);
+      return;
+    }
+
+    if (RegExp('update').hasMatch(command)) {
+      if (nextTimerRun case final time?) {
+        final (hour, minute) = (time.hour, time.minute);
+        await context.reply(_messages.whenNextUpdate.replaceFirst(r'$', 'в $hour:$minute'));
+        return;
+      }
+
+      await context.reply('Время неизвестно, попробуйте позже');
+
       return;
     }
   }
