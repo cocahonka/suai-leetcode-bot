@@ -429,4 +429,15 @@ final class UserLeetCodeSubmissions {
   final User user;
   final LeetCodeAccount account;
   final List<SolvedLeetCodeTask> solvedTasks;
+
+  UserLeetCodeSubmissions copyWith({
+    User? user,
+    LeetCodeAccount? account,
+    List<SolvedLeetCodeTask>? solvedTasks,
+  }) =>
+      UserLeetCodeSubmissions(
+        user: user ?? this.user,
+        account: account ?? this.account,
+        solvedTasks: solvedTasks ?? this.solvedTasks,
+      );
 }
