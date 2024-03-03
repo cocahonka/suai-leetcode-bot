@@ -172,6 +172,7 @@ class AppDatabase extends _$AppDatabase {
         );
       }
     });
+    await deleteSolvedDuplications();
   }
 
   Future<List<({LeetCodeTask task, bool isSolved})>> getTasksWithUserSolutions({
@@ -192,6 +193,28 @@ class AppDatabase extends _$AppDatabase {
       final isSolved = solvedTaskIds.contains(task.id);
       return (task: task, isSolved: isSolved);
     }).toList();
+  }
+
+  Future<void> deleteSolvedDuplications() async {
+    final allEntries = await select(solvedLeetCodeTasks).get();
+
+    final groupedEntries = <(int, int), List<SolvedLeetCodeTask>>{};
+    for (final entry in allEntries) {
+      final key = (entry.user, entry.task);
+      groupedEntries.putIfAbsent(key, () => []).add(entry);
+    }
+
+    final idsToDelete = <int>[];
+    for (final group in groupedEntries.values) {
+      if (group.length > 1) {
+        group.sort((a, b) => a.date.compareTo(b.date));
+        idsToDelete.addAll(group.skip(1).map((e) => e.id));
+      }
+    }
+
+    for (final id in idsToDelete) {
+      await (delete(solvedLeetCodeTasks)..where((t) => t.id.equals(id))).go();
+    }
   }
 
   Future<List<CategoryRating>> getRatingPerCategory() async {
@@ -429,4 +452,15 @@ final class UserLeetCodeSubmissions {
   final User user;
   final LeetCodeAccount account;
   final List<SolvedLeetCodeTask> solvedTasks;
+
+  UserLeetCodeSubmissions copyWith({
+    User? user,
+    LeetCodeAccount? account,
+    List<SolvedLeetCodeTask>? solvedTasks,
+  }) =>
+      UserLeetCodeSubmissions(
+        user: user ?? this.user,
+        account: account ?? this.account,
+        solvedTasks: solvedTasks ?? this.solvedTasks,
+      );
 }

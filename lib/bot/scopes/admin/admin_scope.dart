@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -299,22 +300,51 @@ final class AdminScope extends TelegramScope<AdminState> {
 
   Future<void> _exportRating(Context<Session> context) async {
     final excel = Excel.createExcel();
+
+    await _database.deleteSolvedDuplications();
     final ratingPerCategory = await _database.getRatingPerCategory();
+
+    final globalRatingSheet = excel[excel.getDefaultSheet() ?? 'Global Rating']
+      ..appendRow(const [
+        TextCellValue('Место'),
+        TextCellValue('Никнейм'),
+        TextCellValue('Задачи'),
+      ]);
+    final globalSubmissions =
+        ratingPerCategory.map((categoriesRating) => categoriesRating.usersSubmissions).flattened.toList();
+    final groupedSubmissions = _groupSubmissionsByUser(globalSubmissions)
+      ..sort(
+        (a, b) => b.solvedTasks.length.compareTo(a.solvedTasks.length),
+      );
+
+    var lastPlaceByCount = (place: 0, count: -1);
+    for (final UserLeetCodeSubmissions(:account, :solvedTasks) in groupedSubmissions) {
+      lastPlaceByCount = solvedTasks.length == lastPlaceByCount.count
+          ? lastPlaceByCount
+          : (place: lastPlaceByCount.place + 1, count: solvedTasks.length);
+
+      globalRatingSheet.appendRow([
+        TextCellValue(lastPlaceByCount.place.toString()),
+        TextCellValue(account.nickname),
+        TextCellValue(solvedTasks.length.toString()),
+      ]);
+    }
 
     for (final CategoryRating(:category, :tasks, :usersSubmissions) in ratingPerCategory) {
       final sheet = excel[category.shortTitle]
         ..merge(
           CellIndex.indexByString('A1'),
-          CellIndex.indexByColumnRow(columnIndex: tasks.length + 3, rowIndex: 0),
+          CellIndex.indexByColumnRow(columnIndex: tasks.length + 4, rowIndex: 0),
           customValue: TextCellValue(category.title),
         )
         ..updateCell(CellIndex.indexByString('A2'), const TextCellValue('№'))
         ..updateCell(CellIndex.indexByString('B2'), const TextCellValue('Имя'))
-        ..updateCell(CellIndex.indexByString('C2'), const TextCellValue('Ник'));
+        ..updateCell(CellIndex.indexByString('C2'), const TextCellValue('Ник'))
+        ..updateCell(CellIndex.indexByString('D2'), const TextCellValue('Решено'));
 
       for (final (index, leetCodeTask) in tasks.indexed) {
         sheet.updateCell(
-          CellIndex.indexByColumnRow(columnIndex: index + 3, rowIndex: 1),
+          CellIndex.indexByColumnRow(columnIndex: index + 4, rowIndex: 1),
           TextCellValue('${leetCodeTask.complexity.cutName} ${leetCodeTask.title}'),
         );
       }
@@ -333,6 +363,7 @@ final class AdminScope extends TelegramScope<AdminState> {
           TextCellValue('${index + 1}'),
           TextCellValue(submissions.user.name ?? _messages.exportRatingUnknownUsername),
           TextCellValue(submissions.account.nickname),
+          TextCellValue(submissions.solvedTasks.length.toString()),
           ...markers,
         ]);
       }
@@ -353,6 +384,21 @@ final class AdminScope extends TelegramScope<AdminState> {
         ),
       ),
     );
+  }
+
+  List<UserLeetCodeSubmissions> _groupSubmissionsByUser(List<UserLeetCodeSubmissions> globalSubmissions) {
+    final groupedSubmissions = <int, UserLeetCodeSubmissions>{};
+    for (final submissions in globalSubmissions) {
+      groupedSubmissions.update(
+        submissions.user.id,
+        (value) => value.copyWith(
+          solvedTasks: value.solvedTasks + submissions.solvedTasks,
+        ),
+        ifAbsent: () => submissions,
+      );
+    }
+
+    return groupedSubmissions.values.toList();
   }
 }
 
