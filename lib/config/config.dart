@@ -5,6 +5,8 @@ class Config {
   const Config({
     required this.telegramToken,
     required this.leetCodeUpdateIntervalInSeconds,
+    required this.leetCodeUpdateCoolingTimeInSeconds,
+    required this.leetCodeBatchRequestSize,
     required this.registerMessages,
     required this.userMessages,
     required this.adminMessages,
@@ -15,6 +17,8 @@ class Config {
       {
         'telegramToken': final String telegramToken,
         'leetCodeUpdateIntervalInSeconds': final int leetCodeUpdateIntervalInSeconds,
+        'leetCodeUpdateCoolingTimeInSeconds': final int leetCodeUpdateCoolingTimeInSeconds,
+        'leetCodeBatchRequestSize': final int leetCodeBatchRequestSize,
         'messages': {
           'register': {
             'onStart': final String onStart,
@@ -69,6 +73,8 @@ class Config {
         Config(
           telegramToken: telegramToken,
           leetCodeUpdateIntervalInSeconds: leetCodeUpdateIntervalInSeconds,
+          leetCodeUpdateCoolingTimeInSeconds: leetCodeUpdateCoolingTimeInSeconds,
+          leetCodeBatchRequestSize: leetCodeBatchRequestSize,
           registerMessages: RegisterMessages(
             onStart: onStart,
             requestName: requestName,
@@ -124,6 +130,8 @@ class Config {
 
   final String telegramToken;
   final int leetCodeUpdateIntervalInSeconds;
+  final int leetCodeUpdateCoolingTimeInSeconds;
+  final int leetCodeBatchRequestSize;
   final RegisterMessages registerMessages;
   final UserMessages userMessages;
   final AdminMessages adminMessages;
