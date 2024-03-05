@@ -27,6 +27,7 @@ final class LeetCodeService {
 
   void start() {
     final updateDuration = Duration(seconds: _leetCodeUpdateIntervalInSeconds + _leetCodeUpdateCoolingTimeInSeconds);
+    _nextTimerRunStreamController.add(DateTime.now().add(updateDuration));
 
     Timer.periodic(updateDuration, (timer) {
       _nextTimerRunStreamController.add(DateTime.now().add(updateDuration));
