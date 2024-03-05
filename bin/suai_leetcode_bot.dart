@@ -70,6 +70,8 @@ void main() async {
 
   LeetCodeService(
     leetCodeUpdateIntervalInSeconds: config.leetCodeUpdateIntervalInSeconds,
+    leetCodeUpdateCoolingTimeInSeconds: config.leetCodeUpdateCoolingTimeInSeconds,
+    leetCodeBatchRequestSize: config.leetCodeBatchRequestSize,
     database: database,
     leetCodeRepository: leetCodeRepository,
   ).start();
