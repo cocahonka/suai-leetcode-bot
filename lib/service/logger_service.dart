@@ -17,9 +17,12 @@ final class LoggerService {
   }
 
   void writeError(Object e, StackTrace s) {
+    final moscowTime = DateTime.now().add(const Duration(hours: 3));
+
     final buffer = StringBuffer()
       ..writeln('${"-" * 10} BEGIN OF ERROR ${"-" * 10}')
-      ..writeln('Error $e with StackTrace $s')
+      ..writeln('With time (UTC+3): $moscowTime')
+      ..writeln('Error $e with StackTrace \n$s')
       ..writeln('${"-" * 10} END OF ERROR ${"-" * 10}')
       ..writeln('\n');
 

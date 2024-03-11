@@ -54,6 +54,10 @@ final class HttpLeetCodeRepository {
         body: jsonEncode(data),
       );
 
+      if (response.statusCode == 403) {
+        throw HttpException('Leetcode forbidden error per user $nickname\nBody:\n${response.body}');
+      }
+
       if (response.statusCode != 200) {
         throw HttpException('Error ${response.statusCode}: ${response.body}');
       }
