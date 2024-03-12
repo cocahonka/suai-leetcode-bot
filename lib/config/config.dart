@@ -51,6 +51,8 @@ class Config {
             'whenNextUpdate': final String whenNextUpdate,
           },
           'admin': {
+            'logsIsEmpty': final String logsIsEmpty,
+            'exportLogs': final String exportLogs,
             'chooseMenuItem': final String $adminChooseMenuItem,
             'exportRating': final String exportRating,
             'exportRatingFilename': final String exportRatingFilename,
@@ -106,6 +108,8 @@ class Config {
             whenNextUpdate: whenNextUpdate,
           ),
           adminMessages: AdminMessages(
+            logsIsEmpty: logsIsEmpty,
+            exportLogs: exportLogs,
             chooseMenuItem: $adminChooseMenuItem,
             exportRating: exportRating,
             exportRatingFilename: exportRatingFilename,
@@ -207,6 +211,8 @@ class UserMessages extends Messages {
 
 class AdminMessages extends Messages {
   AdminMessages({
+    required this.logsIsEmpty,
+    required this.exportLogs,
     required this.chooseMenuItem,
     required this.exportRating,
     required this.exportRatingFilename,
@@ -225,6 +231,8 @@ class AdminMessages extends Messages {
     required this.exit,
   });
 
+  final String logsIsEmpty;
+  final String exportLogs;
   final String chooseMenuItem;
   final String exportRating;
   final String exportRatingFilename;

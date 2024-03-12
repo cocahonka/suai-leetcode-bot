@@ -9,7 +9,7 @@ final class LoggerService {
 
   static final LoggerService _instance = LoggerService._internal();
 
-  File get _file {
+  File get file {
     final scriptFolderPath = File(Platform.script.toFilePath()).parent.path;
     final logsFolderPath = path.join(scriptFolderPath, 'logs');
     final logsFile = File(path.join(logsFolderPath, 'logs.logs'))..createSync(recursive: true);
@@ -26,6 +26,6 @@ final class LoggerService {
       ..writeln('${"-" * 10} END OF ERROR ${"-" * 10}')
       ..writeln('\n');
 
-    _file.writeAsStringSync(buffer.toString(), mode: FileMode.append);
+    file.writeAsStringSync(buffer.toString(), mode: FileMode.append);
   }
 }
