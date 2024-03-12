@@ -13,6 +13,7 @@ import 'package:suai_leetcode_bot/bot/scopes/telegram_scope.dart';
 import 'package:suai_leetcode_bot/config/config.dart';
 import 'package:suai_leetcode_bot/constants/crud.dart';
 import 'package:suai_leetcode_bot/data/database/database.dart';
+import 'package:suai_leetcode_bot/extensions/file_extensions.dart';
 import 'package:suai_leetcode_bot/service/logger_service.dart';
 import 'package:televerse/telegram.dart';
 import 'package:televerse/televerse.dart';
@@ -87,6 +88,8 @@ final class AdminScope extends TelegramScope<AdminState> {
               .row()
               .add(_messages.crudCategories, '${identificator}_${AdminQueryEvent.requestCRUD.name}')
               .row()
+              .add(_messages.exportLogs, '${identificator}_${AdminQueryEvent.exportLogs.name}')
+              .row()
               .add(_messages.exit, '${identificator}_${AdminQueryEvent.exit.name}')
               .row(),
         );
@@ -112,6 +115,8 @@ final class AdminScope extends TelegramScope<AdminState> {
         await _exportRating(context);
       case AdminQueryEvent.exportCategories:
         await _exportCategories(context);
+      case AdminQueryEvent.exportLogs:
+        await _exportLogs(context);
       case AdminQueryEvent.requestCRUD:
         await _requestCRUD(context);
       case AdminQueryEvent.cancelCRUD:
@@ -384,6 +389,17 @@ final class AdminScope extends TelegramScope<AdminState> {
         ),
       ),
     );
+  }
+
+  Future<void> _exportLogs(Context context) async {
+    final logsFile = LoggerService().file;
+
+    if (logsFile.isEmptySync) {
+      await context.reply(_messages.logsIsEmpty);
+      return;
+    }
+
+    await context.replyWithDocument(InputFile.fromFile(logsFile, name: 'logs.logs'));
   }
 
   List<UserLeetCodeSubmissions> _groupSubmissionsByUser(List<UserLeetCodeSubmissions> globalSubmissions) {
