@@ -12,7 +12,8 @@ final class LoggerService {
   File get file {
     final scriptFolderPath = File(Platform.script.toFilePath()).parent.path;
     final logsFolderPath = path.join(scriptFolderPath, 'logs');
-    final logsFile = File(path.join(logsFolderPath, 'logs.logs'))..createSync(recursive: true);
+    final logsFile = File(path.join(logsFolderPath, 'logs.logs'))
+      ..createSync(recursive: true);
     return logsFile;
   }
 

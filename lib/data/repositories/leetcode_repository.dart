@@ -29,7 +29,10 @@ final class HttpLeetCodeRepository {
     }
   }
 
-  Future<List<({String slug, int timestamp})>?> getRecentUserSubmission(String nickname, [int limit = 10]) async {
+  Future<List<({String slug, int timestamp})>?> getRecentUserSubmission(
+    String nickname, [
+    int limit = 10,
+  ]) async {
     final data = {
       'query': r'''
     query recentAcSubmissions($username: String!, $limit: Int!) {
@@ -55,7 +58,9 @@ final class HttpLeetCodeRepository {
       );
 
       if (response.statusCode == 403) {
-        throw HttpException('Leetcode forbidden error per user $nickname\nBody:\n${response.body}');
+        throw HttpException(
+          'Leetcode forbidden error per user $nickname\nBody:\n${response.body}',
+        );
       }
 
       if (response.statusCode != 200) {
@@ -64,7 +69,13 @@ final class HttpLeetCodeRepository {
 
       final json = jsonDecode(response.body) as Map<String, dynamic>;
 
-      if (json case {'data': {'recentAcSubmissionList': final List<dynamic> recentAcSubmissionList}}) {
+      if (json
+          case {
+            'data': {
+              'recentAcSubmissionList': final List<dynamic>
+                  recentAcSubmissionList
+            }
+          }) {
         final result = recentAcSubmissionList.map((entry) {
           final map = entry as Map<String, dynamic>;
           return (

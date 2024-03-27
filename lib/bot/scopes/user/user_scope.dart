@@ -31,7 +31,7 @@ final class UserScope extends TelegramScope<UserState> {
   RegExp get commands => RegExp(r'^(\/help|\/info|\/update)$');
 
   @override
-  FutureOr<void> callbackOnCommand(Context<Session> context) async {
+  FutureOr<void> callbackOnCommand(Context context) async {
     if (context.chat?.isForum ?? false) return;
 
     final command = context.message!.text!;
@@ -49,9 +49,16 @@ final class UserScope extends TelegramScope<UserState> {
     if (RegExp('update').hasMatch(command)) {
       if (nextTimerRun case final time?) {
         final differenceTime = time.difference(DateTime.now());
-        final (hour, minute, seconds) = (differenceTime.inHours, differenceTime.inMinutes, differenceTime.inSeconds);
+        final (hour, minute, seconds) = (
+          differenceTime.inHours,
+          differenceTime.inMinutes,
+          differenceTime.inSeconds
+        );
         await context.reply(
-          _messages.whenNextUpdate.replaceFirst(r'$', '\nчерез $hour ч. ${minute % 60} м. ${seconds % 60} с.'),
+          _messages.whenNextUpdate.replaceFirst(
+            r'$',
+            '\nчерез $hour ч. ${minute % 60} м. ${seconds % 60} с.',
+          ),
         );
         return;
       }
@@ -63,7 +70,7 @@ final class UserScope extends TelegramScope<UserState> {
   }
 
   @override
-  bool predicate(Context<Session> context) {
+  bool predicate(Context context) {
     if (context.chat?.isForum ?? false) return false;
 
     final chatId = context.chat?.id;
@@ -75,7 +82,7 @@ final class UserScope extends TelegramScope<UserState> {
   }
 
   @override
-  FutureOr<void> callbackOnMessage(Context<Session> context) async {
+  FutureOr<void> callbackOnMessage(Context context) async {
     await context.reply(
       _messages.chooseMenuItem,
       replyMarkup: InlineKeyboard()
@@ -85,20 +92,25 @@ final class UserScope extends TelegramScope<UserState> {
           .row()
           .addUrl(_messages.joinClubCaption, _messages.joinClubLink)
           .row()
-          .add(_messages.categoryListCaption, '${identificator}_${UserQueryEvent.showCategories.name}')
+          .add(
+            _messages.categoryListCaption,
+            '${identificator}_${UserQueryEvent.showCategories.name}',
+          )
           .row(),
     );
   }
 
   @override
-  FutureOr<void> callbackOnQuery(Context<Session> context) async {
+  FutureOr<void> callbackOnQuery(Context context) async {
     if (context.chat?.isForum ?? false) return;
 
     await context.answerCallbackQuery();
 
     final queryData = context.callbackQuery!.data!;
-    final queryEventIdentificator = queryPattern.firstMatch(queryData)!.group(1)!;
-    final queryEvent = UserQueryEvent.values.firstWhereOrNull((value) => value.name == queryEventIdentificator);
+    final queryEventIdentificator =
+        queryPattern.firstMatch(queryData)!.group(1)!;
+    final queryEvent = UserQueryEvent.values
+        .firstWhereOrNull((value) => value.name == queryEventIdentificator);
 
     switch (queryEvent) {
       case UserQueryEvent.showCategories:
@@ -115,26 +127,35 @@ final class UserScope extends TelegramScope<UserState> {
     }
   }
 
-  Future<void> _showCategories(Context<Session> context) async {
+  Future<void> _showCategories(Context context) async {
     final categories = await _database.allCategories;
     final keyboard = InlineKeyboard();
     for (final Category(:id, :shortTitle) in categories) {
       keyboard
-        ..add(shortTitle, '${identificator}_${UserQueryEvent.showCategoryDetails.name}?id=$id')
+        ..add(
+          shortTitle,
+          '${identificator}_${UserQueryEvent.showCategoryDetails.name}?id=$id',
+        )
         ..row();
     }
 
     keyboard
-      ..add(_messages.backToMenu, '${identificator}_${UserQueryEvent.backToMenu.name}')
+      ..add(
+        _messages.backToMenu,
+        '${identificator}_${UserQueryEvent.backToMenu.name}',
+      )
       ..row();
 
     await context.reply(_messages.chooseCategory, replyMarkup: keyboard);
   }
 
-  Future<void> _showCategory(Context<Session> context, int categoryId) async {
+  Future<void> _showCategory(Context context, int categoryId) async {
     final chatId = context.chat!.id;
     final category = await _database.getCategory(categoryId);
-    final tasks = await _database.getTasksWithUserSolutions(categoryId: categoryId, telegramId: chatId);
+    final tasks = await _database.getTasksWithUserSolutions(
+      categoryId: categoryId,
+      telegramId: chatId,
+    );
 
     final keyboard = InlineKeyboard().add(
       _messages.backToCategories,
@@ -165,7 +186,7 @@ final class UserScope extends TelegramScope<UserState> {
   }
 
   @override
-  FutureOr<void> executeInitialStatePoint(Context<Session> context) async {
+  FutureOr<void> executeInitialStatePoint(Context context) async {
     await callbackOnMessage(context);
   }
 }

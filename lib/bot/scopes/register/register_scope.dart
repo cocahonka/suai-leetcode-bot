@@ -41,7 +41,7 @@ final class RegisterScope extends TelegramScope<RegisterState> {
   RegExp get commands => RegExp(r'^\/start$');
 
   @override
-  FutureOr<void> callbackOnCommand(Context<Session> context) async {
+  FutureOr<void> callbackOnCommand(Context context) async {
     if (context.chat?.isForum ?? false) return;
 
     final chatId = context.chat!.id;
@@ -58,7 +58,7 @@ final class RegisterScope extends TelegramScope<RegisterState> {
   }
 
   @override
-  bool predicate(Context<Session> context) {
+  bool predicate(Context context) {
     if (context.chat?.isForum ?? false) return false;
 
     final chatId = context.chat?.id;
@@ -71,21 +71,23 @@ final class RegisterScope extends TelegramScope<RegisterState> {
   }
 
   @override
-  FutureOr<void> callbackOnMessage(Context<Session> context) async {
+  FutureOr<void> callbackOnMessage(Context context) async {
     final chatId = context.chat!.id;
     final state = repository.getState(chatId: chatId);
 
     await switch (state) {
       RegisterInitial() => _requestName(context, chatId, state),
       RegisterWaitingForName() => _takeName(context, chatId, state),
-      RegisterWaitingForGroupNumber() => _takeGroupNumber(context, chatId, state),
-      RegisterWaitingForLeetCodeNickname() => _takeLeetCodeNickname(context, chatId, state),
+      RegisterWaitingForGroupNumber() =>
+        _takeGroupNumber(context, chatId, state),
+      RegisterWaitingForLeetCodeNickname() =>
+        _takeLeetCodeNickname(context, chatId, state),
       RegisterCompleted() => Future<void>.value(),
     };
   }
 
   @override
-  FutureOr<void> callbackOnQuery(Context<Session> context) async {
+  FutureOr<void> callbackOnQuery(Context context) async {
     if (context.chat?.isForum ?? false) return;
 
     final chatId = context.chat!.id;
@@ -94,7 +96,8 @@ final class RegisterScope extends TelegramScope<RegisterState> {
     if (state is RegisterCompleted) return;
 
     final queryData = context.callbackQuery!.data!;
-    final queryEventIdentificator = queryPattern.firstMatch(queryData)!.group(1)!;
+    final queryEventIdentificator =
+        queryPattern.firstMatch(queryData)!.group(1)!;
     final queryEvent = RegisterQueryEvent.values.firstWhereOrNull(
       (value) => value.name == queryEventIdentificator,
     );
@@ -113,7 +116,7 @@ final class RegisterScope extends TelegramScope<RegisterState> {
   }
 
   Future<void> _requestName(
-    Context<Session> context,
+    Context context,
     int chatId,
     RegisterInitial state,
   ) async {
@@ -126,7 +129,7 @@ final class RegisterScope extends TelegramScope<RegisterState> {
   }
 
   Future<void> _takeName(
-    Context<Session> context,
+    Context context,
     int chatId,
     RegisterWaitingForName state,
   ) async {
@@ -138,7 +141,10 @@ final class RegisterScope extends TelegramScope<RegisterState> {
       return;
     }
 
-    await context.reply(_messages.requestGroupNumber, replyMarkup: _restartKeyboard);
+    await context.reply(
+      _messages.requestGroupNumber,
+      replyMarkup: _restartKeyboard,
+    );
 
     repository.setState(
       chatId: chatId,
@@ -147,53 +153,76 @@ final class RegisterScope extends TelegramScope<RegisterState> {
   }
 
   Future<void> _takeGroupNumber(
-    Context<Session> context,
+    Context context,
     int chatId,
     RegisterWaitingForGroupNumber state,
   ) async {
     final groupNumber = context.message!.text?.trim().toUpperCase();
 
     if (groupNumber == null || !kGroupNumbers.contains(groupNumber)) {
-      await context.reply(_messages.invalidGroupNumber, replyMarkup: _restartKeyboard);
+      await context.reply(
+        _messages.invalidGroupNumber,
+        replyMarkup: _restartKeyboard,
+      );
       return;
     }
 
-    await context.reply(_messages.requestLeetCodeNickname, replyMarkup: _restartKeyboard);
+    await context.reply(
+      _messages.requestLeetCodeNickname,
+      replyMarkup: _restartKeyboard,
+    );
 
     repository.setState(
       chatId: chatId,
-      state: RegisterWaitingForLeetCodeNickname(name: state.name, groupNumber: groupNumber),
+      state: RegisterWaitingForLeetCodeNickname(
+        name: state.name,
+        groupNumber: groupNumber,
+      ),
     );
   }
 
   Future<void> _takeLeetCodeNickname(
-    Context<Session> context,
+    Context context,
     int chatId,
     RegisterWaitingForLeetCodeNickname state,
   ) async {
     final leetCodeNickname = context.message!.text?.trim();
 
     if (leetCodeNickname == null || !leetCodeNickname.length.inRange(3, 32)) {
-      await context.reply(_messages.invalidLeetCodeNickname, replyMarkup: _restartKeyboard);
+      await context.reply(
+        _messages.invalidLeetCodeNickname,
+        replyMarkup: _restartKeyboard,
+      );
       return;
     }
 
-    final isLeetCodeNicknameAlreadyTaken = await _database.isLeetCodeNicknameAlreadyTaken(leetCodeNickname);
+    final isLeetCodeNicknameAlreadyTaken =
+        await _database.isLeetCodeNicknameAlreadyTaken(leetCodeNickname);
 
     if (isLeetCodeNicknameAlreadyTaken) {
-      await context.reply(_messages.leetCodeNicknameIsAlreadyTaken, replyMarkup: _restartKeyboard);
+      await context.reply(
+        _messages.leetCodeNicknameIsAlreadyTaken,
+        replyMarkup: _restartKeyboard,
+      );
       return;
     }
 
-    final isLeetCodeNicknameExist = await _leetCodeRepository.isUserExist(leetCodeNickname);
+    final isLeetCodeNicknameExist =
+        await _leetCodeRepository.isUserExist(leetCodeNickname);
 
     if (isLeetCodeNicknameExist == null) {
-      await context.reply(_messages.leetCodeNicknameGetError, replyMarkup: _restartKeyboard);
+      await context.reply(
+        _messages.leetCodeNicknameGetError,
+        replyMarkup: _restartKeyboard,
+      );
       return;
     }
 
     if (!isLeetCodeNicknameExist) {
-      await context.reply(_messages.leetCodeNicknameNotExist, replyMarkup: _restartKeyboard);
+      await context.reply(
+        _messages.leetCodeNicknameNotExist,
+        replyMarkup: _restartKeyboard,
+      );
       return;
     }
 

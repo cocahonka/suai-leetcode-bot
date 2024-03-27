@@ -16,8 +16,10 @@ class Config {
     return switch (json) {
       {
         'telegramToken': final String telegramToken,
-        'leetCodeUpdateIntervalInSeconds': final int leetCodeUpdateIntervalInSeconds,
-        'leetCodeUpdateCoolingTimeInSeconds': final int leetCodeUpdateCoolingTimeInSeconds,
+        'leetCodeUpdateIntervalInSeconds': final int
+            leetCodeUpdateIntervalInSeconds,
+        'leetCodeUpdateCoolingTimeInSeconds': final int
+            leetCodeUpdateCoolingTimeInSeconds,
         'leetCodeBatchRequestSize': final int leetCodeBatchRequestSize,
         'messages': {
           'register': {
@@ -28,7 +30,8 @@ class Config {
             'invalidGroupNumber': final String invalidGroupNumber,
             'requestLeetCodeNickname': final String requestLeetCodeNickname,
             'invalidLeetCodeNickname': final String invalidLeetCodeNickname,
-            'leetCodeNicknameIsAlreadyTaken': final String leetCodeNicknameIsAlreadyTaken,
+            'leetCodeNicknameIsAlreadyTaken': final String
+                leetCodeNicknameIsAlreadyTaken,
             'leetCodeNicknameNotExist': final String leetCodeNicknameNotExist,
             'successfulRegistration': final String successfulRegistration,
             'restartRegistration': final String restartRegistration,
@@ -57,7 +60,8 @@ class Config {
             'exportRating': final String exportRating,
             'exportRatingFilename': final String exportRatingFilename,
             'exportRatingSaveFail': final String exportRatingSaveFail,
-            'exportRatingUnknownUsername': final String exportRatingUnknownUsername,
+            'exportRatingUnknownUsername': final String
+                exportRatingUnknownUsername,
             'exportCategories': final String exportCategories,
             'exportCategoriesFilename': final String exportCategoriesFilename,
             'crudCategories': final String crudCategories,
@@ -75,7 +79,8 @@ class Config {
         Config(
           telegramToken: telegramToken,
           leetCodeUpdateIntervalInSeconds: leetCodeUpdateIntervalInSeconds,
-          leetCodeUpdateCoolingTimeInSeconds: leetCodeUpdateCoolingTimeInSeconds,
+          leetCodeUpdateCoolingTimeInSeconds:
+              leetCodeUpdateCoolingTimeInSeconds,
           leetCodeBatchRequestSize: leetCodeBatchRequestSize,
           registerMessages: RegisterMessages(
             onStart: onStart,
@@ -128,7 +133,9 @@ class Config {
             exit: exit,
           ),
         ),
-      _ => throw const FormatException('The configuration file does not match the template')
+      _ => throw const FormatException(
+          'The configuration file does not match the template',
+        )
     };
   }
 

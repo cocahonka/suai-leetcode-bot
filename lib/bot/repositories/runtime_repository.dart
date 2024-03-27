@@ -6,8 +6,10 @@ final class RuntimeRepository<State> extends TelegramStateRepository<State> {
   final Map<int, State> _states = {};
 
   @override
-  State getState({required int chatId}) => _states.putIfAbsent(chatId, () => super.initialState);
+  State getState({required int chatId}) =>
+      _states.putIfAbsent(chatId, () => super.initialState);
 
   @override
-  void setState({required int chatId, required State state}) => _states[chatId] = state;
+  void setState({required int chatId, required State state}) =>
+      _states[chatId] = state;
 }
