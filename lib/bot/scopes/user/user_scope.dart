@@ -56,7 +56,9 @@ final class UserScope extends TelegramScope<UserState> {
         );
         await context.reply(
           _messages.whenNextUpdate.replaceFirst(
-              r'$', '\nчерез $hour ч. ${minute % 60} м. ${seconds % 60} с.'),
+            r'$',
+            '\nчерез $hour ч. ${minute % 60} м. ${seconds % 60} с.',
+          ),
         );
         return;
       }
@@ -90,8 +92,10 @@ final class UserScope extends TelegramScope<UserState> {
           .row()
           .addUrl(_messages.joinClubCaption, _messages.joinClubLink)
           .row()
-          .add(_messages.categoryListCaption,
-              '${identificator}_${UserQueryEvent.showCategories.name}')
+          .add(
+            _messages.categoryListCaption,
+            '${identificator}_${UserQueryEvent.showCategories.name}',
+          )
           .row(),
     );
   }
@@ -128,14 +132,18 @@ final class UserScope extends TelegramScope<UserState> {
     final keyboard = InlineKeyboard();
     for (final Category(:id, :shortTitle) in categories) {
       keyboard
-        ..add(shortTitle,
-            '${identificator}_${UserQueryEvent.showCategoryDetails.name}?id=$id')
+        ..add(
+          shortTitle,
+          '${identificator}_${UserQueryEvent.showCategoryDetails.name}?id=$id',
+        )
         ..row();
     }
 
     keyboard
-      ..add(_messages.backToMenu,
-          '${identificator}_${UserQueryEvent.backToMenu.name}')
+      ..add(
+        _messages.backToMenu,
+        '${identificator}_${UserQueryEvent.backToMenu.name}',
+      )
       ..row();
 
     await context.reply(_messages.chooseCategory, replyMarkup: keyboard);
@@ -145,7 +153,9 @@ final class UserScope extends TelegramScope<UserState> {
     final chatId = context.chat!.id;
     final category = await _database.getCategory(categoryId);
     final tasks = await _database.getTasksWithUserSolutions(
-        categoryId: categoryId, telegramId: chatId);
+      categoryId: categoryId,
+      telegramId: chatId,
+    );
 
     final keyboard = InlineKeyboard().add(
       _messages.backToCategories,

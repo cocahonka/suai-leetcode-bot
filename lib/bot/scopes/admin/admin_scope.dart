@@ -83,20 +83,30 @@ final class AdminScope extends TelegramScope<AdminState> {
         await context.reply(
           _messages.chooseMenuItem,
           replyMarkup: InlineKeyboard()
-              .add(_messages.exportRating,
-                  '${identificator}_${AdminQueryEvent.exportRating.name}')
+              .add(
+                _messages.exportRating,
+                '${identificator}_${AdminQueryEvent.exportRating.name}',
+              )
               .row()
-              .add(_messages.exportCategories,
-                  '${identificator}_${AdminQueryEvent.exportCategories.name}')
+              .add(
+                _messages.exportCategories,
+                '${identificator}_${AdminQueryEvent.exportCategories.name}',
+              )
               .row()
-              .add(_messages.crudCategories,
-                  '${identificator}_${AdminQueryEvent.requestCRUD.name}')
+              .add(
+                _messages.crudCategories,
+                '${identificator}_${AdminQueryEvent.requestCRUD.name}',
+              )
               .row()
-              .add(_messages.exportLogs,
-                  '${identificator}_${AdminQueryEvent.exportLogs.name}')
+              .add(
+                _messages.exportLogs,
+                '${identificator}_${AdminQueryEvent.exportLogs.name}',
+              )
               .row()
-              .add(_messages.exit,
-                  '${identificator}_${AdminQueryEvent.exit.name}')
+              .add(
+                _messages.exit,
+                '${identificator}_${AdminQueryEvent.exit.name}',
+              )
               .row(),
         );
       case AdminInitial():
@@ -176,8 +186,10 @@ final class AdminScope extends TelegramScope<AdminState> {
       await context.reply(
         _messages.crudFileFormatError,
         replyMarkup: InlineKeyboard()
-            .add(_messages.crudCancel,
-                '${identificator}_${AdminQueryEvent.cancelCRUD.name}')
+            .add(
+              _messages.crudCancel,
+              '${identificator}_${AdminQueryEvent.cancelCRUD.name}',
+            )
             .row(),
       );
       return;
@@ -278,9 +290,11 @@ final class AdminScope extends TelegramScope<AdminState> {
     await context.replyWithMediaGroup(
       [
         InputMediaDocument(
-            media: InputFile.fromBytes(exampleCrudBytes, name: 'example.json')),
+          media: InputFile.fromBytes(exampleCrudBytes, name: 'example.json'),
+        ),
         InputMediaDocument(
-            media: InputFile.fromBytes(emptyCrudBytes, name: 'form.json')),
+          media: InputFile.fromBytes(emptyCrudBytes, name: 'form.json'),
+        ),
       ],
       protectContent: true,
     );
@@ -358,20 +372,25 @@ final class AdminScope extends TelegramScope<AdminState> {
         ..merge(
           CellIndex.indexByString('A1'),
           CellIndex.indexByColumnRow(
-              columnIndex: tasks.length + 4, rowIndex: 0),
+            columnIndex: tasks.length + 4,
+            rowIndex: 0,
+          ),
           customValue: TextCellValue(category.title),
         )
         ..updateCell(CellIndex.indexByString('A2'), const TextCellValue('№'))
         ..updateCell(CellIndex.indexByString('B2'), const TextCellValue('Имя'))
         ..updateCell(CellIndex.indexByString('C2'), const TextCellValue('Ник'))
         ..updateCell(
-            CellIndex.indexByString('D2'), const TextCellValue('Решено'));
+          CellIndex.indexByString('D2'),
+          const TextCellValue('Решено'),
+        );
 
       for (final (index, leetCodeTask) in tasks.indexed) {
         sheet.updateCell(
           CellIndex.indexByColumnRow(columnIndex: index + 4, rowIndex: 1),
           TextCellValue(
-              '${leetCodeTask.complexity.cutName} ${leetCodeTask.title}'),
+            '${leetCodeTask.complexity.cutName} ${leetCodeTask.title}',
+          ),
         );
       }
 
@@ -383,13 +402,15 @@ final class AdminScope extends TelegramScope<AdminState> {
           });
 
           markers.add(
-              isSolved ? const TextCellValue('+') : const TextCellValue(''));
+            isSolved ? const TextCellValue('+') : const TextCellValue(''),
+          );
         }
 
         sheet.appendRow([
           TextCellValue('${index + 1}'),
           TextCellValue(
-              submissions.user.name ?? _messages.exportRatingUnknownUsername),
+            submissions.user.name ?? _messages.exportRatingUnknownUsername,
+          ),
           TextCellValue(submissions.account.nickname),
           TextCellValue(submissions.solvedTasks.length.toString()),
           ...markers,
@@ -427,7 +448,8 @@ final class AdminScope extends TelegramScope<AdminState> {
   }
 
   List<UserLeetCodeSubmissions> _groupSubmissionsByUser(
-      List<UserLeetCodeSubmissions> globalSubmissions) {
+    List<UserLeetCodeSubmissions> globalSubmissions,
+  ) {
     final groupedSubmissions = <int, UserLeetCodeSubmissions>{};
     for (final submissions in globalSubmissions) {
       groupedSubmissions.update(

@@ -141,8 +141,10 @@ final class RegisterScope extends TelegramScope<RegisterState> {
       return;
     }
 
-    await context.reply(_messages.requestGroupNumber,
-        replyMarkup: _restartKeyboard);
+    await context.reply(
+      _messages.requestGroupNumber,
+      replyMarkup: _restartKeyboard,
+    );
 
     repository.setState(
       chatId: chatId,
@@ -158,18 +160,24 @@ final class RegisterScope extends TelegramScope<RegisterState> {
     final groupNumber = context.message!.text?.trim().toUpperCase();
 
     if (groupNumber == null || !kGroupNumbers.contains(groupNumber)) {
-      await context.reply(_messages.invalidGroupNumber,
-          replyMarkup: _restartKeyboard);
+      await context.reply(
+        _messages.invalidGroupNumber,
+        replyMarkup: _restartKeyboard,
+      );
       return;
     }
 
-    await context.reply(_messages.requestLeetCodeNickname,
-        replyMarkup: _restartKeyboard);
+    await context.reply(
+      _messages.requestLeetCodeNickname,
+      replyMarkup: _restartKeyboard,
+    );
 
     repository.setState(
       chatId: chatId,
       state: RegisterWaitingForLeetCodeNickname(
-          name: state.name, groupNumber: groupNumber),
+        name: state.name,
+        groupNumber: groupNumber,
+      ),
     );
   }
 
@@ -181,8 +189,10 @@ final class RegisterScope extends TelegramScope<RegisterState> {
     final leetCodeNickname = context.message!.text?.trim();
 
     if (leetCodeNickname == null || !leetCodeNickname.length.inRange(3, 32)) {
-      await context.reply(_messages.invalidLeetCodeNickname,
-          replyMarkup: _restartKeyboard);
+      await context.reply(
+        _messages.invalidLeetCodeNickname,
+        replyMarkup: _restartKeyboard,
+      );
       return;
     }
 
@@ -190,8 +200,10 @@ final class RegisterScope extends TelegramScope<RegisterState> {
         await _database.isLeetCodeNicknameAlreadyTaken(leetCodeNickname);
 
     if (isLeetCodeNicknameAlreadyTaken) {
-      await context.reply(_messages.leetCodeNicknameIsAlreadyTaken,
-          replyMarkup: _restartKeyboard);
+      await context.reply(
+        _messages.leetCodeNicknameIsAlreadyTaken,
+        replyMarkup: _restartKeyboard,
+      );
       return;
     }
 
@@ -199,14 +211,18 @@ final class RegisterScope extends TelegramScope<RegisterState> {
         await _leetCodeRepository.isUserExist(leetCodeNickname);
 
     if (isLeetCodeNicknameExist == null) {
-      await context.reply(_messages.leetCodeNicknameGetError,
-          replyMarkup: _restartKeyboard);
+      await context.reply(
+        _messages.leetCodeNicknameGetError,
+        replyMarkup: _restartKeyboard,
+      );
       return;
     }
 
     if (!isLeetCodeNicknameExist) {
-      await context.reply(_messages.leetCodeNicknameNotExist,
-          replyMarkup: _restartKeyboard);
+      await context.reply(
+        _messages.leetCodeNicknameNotExist,
+        replyMarkup: _restartKeyboard,
+      );
       return;
     }
 

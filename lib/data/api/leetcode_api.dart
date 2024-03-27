@@ -29,7 +29,8 @@ sealed class LeetCodeApiException implements Exception {
 }
 
 class UnknownCodeException extends LeetCodeApiException {
-  const UnknownCodeException(this.statusCode, this.response) : super('Unknow code $statusCode');
+  const UnknownCodeException(this.statusCode, this.response)
+      : super('Unknow code $statusCode');
 
   final int statusCode;
   final http.Response response;

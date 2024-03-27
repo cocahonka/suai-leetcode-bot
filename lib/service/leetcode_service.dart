@@ -12,12 +12,15 @@ final class LeetCodeService {
     required HttpLeetCodeRepository leetCodeRepository,
   })  : _leetCodeUpdateIntervalInSeconds = leetCodeUpdateIntervalInSeconds,
         _leetCodeBatchRequestSize = leetCodeBatchRequestSize,
-        _leetCodeUpdateCoolingTimeInSeconds = leetCodeUpdateCoolingTimeInSeconds,
+        _leetCodeUpdateCoolingTimeInSeconds =
+            leetCodeUpdateCoolingTimeInSeconds,
         _leetCodeRepository = leetCodeRepository,
         _database = database;
 
-  static final StreamController<DateTime> _nextTimerRunStreamController = StreamController.broadcast();
-  static Stream<DateTime> get nextTimerRun => _nextTimerRunStreamController.stream;
+  static final StreamController<DateTime> _nextTimerRunStreamController =
+      StreamController.broadcast();
+  static Stream<DateTime> get nextTimerRun =>
+      _nextTimerRunStreamController.stream;
 
   final int _leetCodeBatchRequestSize;
   final int _leetCodeUpdateIntervalInSeconds;
@@ -26,7 +29,9 @@ final class LeetCodeService {
   final HttpLeetCodeRepository _leetCodeRepository;
 
   void start() {
-    final updateDuration = Duration(seconds: _leetCodeUpdateIntervalInSeconds + _leetCodeUpdateCoolingTimeInSeconds);
+    final updateDuration = Duration(
+        seconds: _leetCodeUpdateIntervalInSeconds +
+            _leetCodeUpdateCoolingTimeInSeconds);
     _nextTimerRunStreamController.add(DateTime.now().add(updateDuration));
 
     Timer.periodic(updateDuration, (timer) {
@@ -38,7 +43,8 @@ final class LeetCodeService {
   Future<void> _updateAccountsPeriodically() async {
     final accounts = await _database.activeLeetCodeAccounts;
     final totalBatches = (accounts.length / _leetCodeBatchRequestSize).ceil();
-    final delayBetweenBatches = _leetCodeUpdateIntervalInSeconds ~/ totalBatches;
+    final delayBetweenBatches =
+        _leetCodeUpdateIntervalInSeconds ~/ totalBatches;
 
     for (var i = 0; i < accounts.length; i += _leetCodeBatchRequestSize) {
       final batch = accounts.skip(i).take(_leetCodeBatchRequestSize);
@@ -51,9 +57,11 @@ final class LeetCodeService {
 
   Future<void> _updateBatch(List<LeetCodeAccount> accounts) async {
     for (final account in accounts) {
-      final submissions = await _leetCodeRepository.getRecentUserSubmission(account.nickname);
+      final submissions =
+          await _leetCodeRepository.getRecentUserSubmission(account.nickname);
       if (submissions != null) {
-        await _database.updateUserSubmissions(userId: account.user, submissions: submissions);
+        await _database.updateUserSubmissions(
+            userId: account.user, submissions: submissions);
       }
     }
   }

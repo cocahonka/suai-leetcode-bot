@@ -34,9 +34,11 @@ void main() async {
     client: httpClient,
   );
 
-  final registerRepository = RuntimeRepository<RegisterState>(initialState: const RegisterInitial());
+  final registerRepository =
+      RuntimeRepository<RegisterState>(initialState: const RegisterInitial());
   for (final User(:telegramId) in await database.authorizedUsers) {
-    registerRepository.setState(chatId: telegramId, state: const RegisterCompleted());
+    registerRepository.setState(
+        chatId: telegramId, state: const RegisterCompleted());
   }
 
   final userScope = UserScope(
@@ -56,7 +58,8 @@ void main() async {
   final adminScope = AdminScope(
     database: database,
     messages: config.adminMessages,
-    repository: RuntimeRepository<AdminState>(initialState: const AdminInitial()),
+    repository:
+        RuntimeRepository<AdminState>(initialState: const AdminInitial()),
     registerRepository: registerRepository,
     onStateComplete: userScope.executeInitialStatePoint,
   );
@@ -70,7 +73,8 @@ void main() async {
 
   LeetCodeService(
     leetCodeUpdateIntervalInSeconds: config.leetCodeUpdateIntervalInSeconds,
-    leetCodeUpdateCoolingTimeInSeconds: config.leetCodeUpdateCoolingTimeInSeconds,
+    leetCodeUpdateCoolingTimeInSeconds:
+        config.leetCodeUpdateCoolingTimeInSeconds,
     leetCodeBatchRequestSize: config.leetCodeBatchRequestSize,
     database: database,
     leetCodeRepository: leetCodeRepository,

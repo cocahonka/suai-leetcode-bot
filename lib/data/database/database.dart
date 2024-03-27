@@ -22,7 +22,8 @@ class LeetCodeAccounts extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get user => integer().unique().references(Users, #id)();
   TextColumn get nickname => text().unique().withLength(min: 3, max: 32)();
-  DateTimeColumn get dateOfAddition => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get dateOfAddition =>
+      dateTime().withDefault(currentDateAndTime)();
   BoolColumn get isGraduated => boolean().withDefault(const Constant(false))();
 }
 
@@ -46,7 +47,8 @@ enum LeetCodeTaskComplexity {
 class LeetCodeTasks extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get slug => text().unique()();
-  IntColumn get category => integer().references(Categories, #id, onDelete: KeyAction.cascade)();
+  IntColumn get category =>
+      integer().references(Categories, #id, onDelete: KeyAction.cascade)();
   TextColumn get title => text().withLength(min: 1, max: 128)();
   TextColumn get link => text().withLength(min: 1, max: 512)();
   TextColumn get complexity => textEnum<LeetCodeTaskComplexity>()();
@@ -55,7 +57,8 @@ class LeetCodeTasks extends Table {
 class SolvedLeetCodeTasks extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get user => integer().references(Users, #id)();
-  IntColumn get task => integer().references(LeetCodeTasks, #id, onDelete: KeyAction.cascade)();
+  IntColumn get task =>
+      integer().references(LeetCodeTasks, #id, onDelete: KeyAction.cascade)();
   DateTimeColumn get date => dateTime()();
 }
 
@@ -117,7 +120,8 @@ class AppDatabase extends _$AppDatabase {
   Future<List<User>> get authorizedUsers => select(users).get();
 
   Future<List<LeetCodeAccount>> get activeLeetCodeAccounts =>
-      (select(leetCodeAccounts)..where((l) => l.isGraduated.equals(false))).get();
+      (select(leetCodeAccounts)..where((l) => l.isGraduated.equals(false)))
+          .get();
 
   Future<List<Category>> get allCategories => (select(categories)
         ..orderBy([
@@ -125,7 +129,8 @@ class AppDatabase extends _$AppDatabase {
         ]))
       .get();
 
-  Future<List<({Category category, List<LeetCodeTask> tasks})>> get tasksByCategories async {
+  Future<List<({Category category, List<LeetCodeTask> tasks})>>
+      get tasksByCategories async {
     final categories = await allCategories;
     return Future.wait(
       List.generate(categories.length, (index) async {
@@ -137,10 +142,12 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
-  Future<Category> getCategory(int id) => (select(categories)..where((c) => c.id.equals(id))).getSingle();
+  Future<Category> getCategory(int id) =>
+      (select(categories)..where((c) => c.id.equals(id))).getSingle();
 
   Future<List<LeetCodeTask>> getTasks(int categoryId) =>
-      (select(leetCodeTasks)..where((l) => l.category.equals(categoryId))).get();
+      (select(leetCodeTasks)..where((l) => l.category.equals(categoryId)))
+          .get();
 
   Future<void> updateUserSubmissions({
     required int userId,
@@ -179,15 +186,19 @@ class AppDatabase extends _$AppDatabase {
     required int categoryId,
     required int telegramId,
   }) async {
-    final tasksInCategory = await (select(leetCodeTasks)..where((t) => t.category.equals(categoryId))).get();
+    final tasksInCategory = await (select(leetCodeTasks)
+          ..where((t) => t.category.equals(categoryId)))
+        .get();
 
     final user = await (select(users)
           ..where((u) => u.telegramId.equals(telegramId))
           ..limit(1))
         .getSingle();
 
-    final solvedTaskIds =
-        await (select(solvedLeetCodeTasks)..where((st) => st.user.equals(user.id))).map((row) => row.task).get();
+    final solvedTaskIds = await (select(solvedLeetCodeTasks)
+          ..where((st) => st.user.equals(user.id)))
+        .map((row) => row.task)
+        .get();
 
     return tasksInCategory.map((task) {
       final isSolved = solvedTaskIds.contains(task.id);
@@ -235,7 +246,9 @@ class AppDatabase extends _$AppDatabase {
     final usersWithProgress = <List<User>>[];
     for (final cat in nonEmptyCategories) {
       categoriesTasks.add(
-        await (select(leetCodeTasks)..where((lct) => lct.category.equals(cat.id))).get(),
+        await (select(leetCodeTasks)
+              ..where((lct) => lct.category.equals(cat.id)))
+            .get(),
       );
 
       final categoriesTasksIds = categoriesTasks.last.map((c) => c.id).toList();
@@ -245,7 +258,9 @@ class AppDatabase extends _$AppDatabase {
               ..where(
                 (usr) => existsQuery(
                   select(solvedLeetCodeTasks)
-                    ..where((slv) => slv.user.equalsExp(usr.id) & slv.task.isIn(categoriesTasksIds)),
+                    ..where((slv) =>
+                        slv.user.equalsExp(usr.id) &
+                        slv.task.isIn(categoriesTasksIds)),
                 ),
               ))
             .get(),
@@ -265,7 +280,9 @@ class AppDatabase extends _$AppDatabase {
               .getSingle();
           final solvedTasks = await (select(solvedLeetCodeTasks)
                 ..where(
-                  (slv) => slv.user.equals(userWithProgress.id) & slv.task.isIn(tasksIds),
+                  (slv) =>
+                      slv.user.equals(userWithProgress.id) &
+                      slv.task.isIn(tasksIds),
                 ))
               .get();
           return UserLeetCodeSubmissions(
@@ -314,10 +331,12 @@ class AppDatabase extends _$AppDatabase {
     });
   }
 
-  Future<(Object e, StackTrace s)?> processCRUD(CRUDOperations operations) async {
+  Future<(Object e, StackTrace s)?> processCRUD(
+      CRUDOperations operations) async {
     try {
       await transaction<void>(() async {
-        final (categories: categoriesOperations, tasks: tasksOperations) = operations;
+        final (categories: categoriesOperations, tasks: tasksOperations) =
+            operations;
 
         for (final categoryCreate in categoriesOperations.create) {
           categoryCreate as Map<String, dynamic>;
