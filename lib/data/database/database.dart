@@ -258,9 +258,11 @@ class AppDatabase extends _$AppDatabase {
               ..where(
                 (usr) => existsQuery(
                   select(solvedLeetCodeTasks)
-                    ..where((slv) =>
-                        slv.user.equalsExp(usr.id) &
-                        slv.task.isIn(categoriesTasksIds)),
+                    ..where(
+                      (slv) =>
+                          slv.user.equalsExp(usr.id) &
+                          slv.task.isIn(categoriesTasksIds),
+                    ),
                 ),
               ))
             .get(),
@@ -332,7 +334,8 @@ class AppDatabase extends _$AppDatabase {
   }
 
   Future<(Object e, StackTrace s)?> processCRUD(
-      CRUDOperations operations) async {
+    CRUDOperations operations,
+  ) async {
     try {
       await transaction<void>(() async {
         final (categories: categoriesOperations, tasks: tasksOperations) =

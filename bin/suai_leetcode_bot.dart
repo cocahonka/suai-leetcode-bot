@@ -38,7 +38,9 @@ void main() async {
       RuntimeRepository<RegisterState>(initialState: const RegisterInitial());
   for (final User(:telegramId) in await database.authorizedUsers) {
     registerRepository.setState(
-        chatId: telegramId, state: const RegisterCompleted());
+      chatId: telegramId,
+      state: const RegisterCompleted(),
+    );
   }
 
   final userScope = UserScope(

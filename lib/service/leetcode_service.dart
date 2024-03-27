@@ -30,8 +30,9 @@ final class LeetCodeService {
 
   void start() {
     final updateDuration = Duration(
-        seconds: _leetCodeUpdateIntervalInSeconds +
-            _leetCodeUpdateCoolingTimeInSeconds);
+      seconds: _leetCodeUpdateIntervalInSeconds +
+          _leetCodeUpdateCoolingTimeInSeconds,
+    );
     _nextTimerRunStreamController.add(DateTime.now().add(updateDuration));
 
     Timer.periodic(updateDuration, (timer) {
@@ -61,7 +62,9 @@ final class LeetCodeService {
           await _leetCodeRepository.getRecentUserSubmission(account.nickname);
       if (submissions != null) {
         await _database.updateUserSubmissions(
-            userId: account.user, submissions: submissions);
+          userId: account.user,
+          submissions: submissions,
+        );
       }
     }
   }

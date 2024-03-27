@@ -134,7 +134,8 @@ class Config {
           ),
         ),
       _ => throw const FormatException(
-          'The configuration file does not match the template')
+          'The configuration file does not match the template',
+        )
     };
   }
 
