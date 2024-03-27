@@ -12,16 +12,16 @@ abstract base class TelegramScope<State> {
   abstract final String identificator;
   final TelegramStateRepository<State> repository;
 
-  final FutureOr<void> Function(Context<Session> context)? onStateComplete;
-  FutureOr<void> executeInitialStatePoint(Context<Session> context) {}
+  final FutureOr<void> Function(Context context)? onStateComplete;
+  FutureOr<void> executeInitialStatePoint(Context context) {}
 
   RegExp get commands;
-  FutureOr<void> callbackOnCommand(Context<Session> context);
+  FutureOr<void> callbackOnCommand(Context context);
 
-  bool predicate(Context<Session> context);
-  FutureOr<void> callbackOnMessage(Context<Session> context);
+  bool predicate(Context context);
+  FutureOr<void> callbackOnMessage(Context context);
 
   RegExp get queryPattern => RegExp('^${identificator}_' r'(\w+)');
 
-  FutureOr<void> callbackOnQuery(Context<Session> context);
+  FutureOr<void> callbackOnQuery(Context context);
 }

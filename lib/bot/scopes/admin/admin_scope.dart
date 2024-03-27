@@ -40,11 +40,12 @@ final class AdminScope extends TelegramScope<AdminState> {
   RegExp get commands => RegExp(r'^\/admin$');
 
   Future<bool> _isAdmin(int chatId) async {
-    return _registerRepository.getState(chatId: chatId) is RegisterCompleted && await _database.isAdmin(chatId);
+    return _registerRepository.getState(chatId: chatId) is RegisterCompleted &&
+        await _database.isAdmin(chatId);
   }
 
   @override
-  FutureOr<void> callbackOnCommand(Context<Session> context) async {
+  FutureOr<void> callbackOnCommand(Context context) async {
     if (context.chat?.isForum ?? false) return;
 
     final chatId = context.chat!.id;
@@ -59,7 +60,7 @@ final class AdminScope extends TelegramScope<AdminState> {
   }
 
   @override
-  bool predicate(Context<Session> context) {
+  bool predicate(Context context) {
     if (context.chat?.isForum ?? false) return false;
 
     final chatId = context.chat?.id;
@@ -70,7 +71,7 @@ final class AdminScope extends TelegramScope<AdminState> {
   }
 
   @override
-  FutureOr<void> callbackOnMessage(Context<Session> context) async {
+  FutureOr<void> callbackOnMessage(Context context) async {
     final chatId = context.chat!.id;
 
     if (!await _isAdmin(chatId)) return;
@@ -82,15 +83,20 @@ final class AdminScope extends TelegramScope<AdminState> {
         await context.reply(
           _messages.chooseMenuItem,
           replyMarkup: InlineKeyboard()
-              .add(_messages.exportRating, '${identificator}_${AdminQueryEvent.exportRating.name}')
+              .add(_messages.exportRating,
+                  '${identificator}_${AdminQueryEvent.exportRating.name}')
               .row()
-              .add(_messages.exportCategories, '${identificator}_${AdminQueryEvent.exportCategories.name}')
+              .add(_messages.exportCategories,
+                  '${identificator}_${AdminQueryEvent.exportCategories.name}')
               .row()
-              .add(_messages.crudCategories, '${identificator}_${AdminQueryEvent.requestCRUD.name}')
+              .add(_messages.crudCategories,
+                  '${identificator}_${AdminQueryEvent.requestCRUD.name}')
               .row()
-              .add(_messages.exportLogs, '${identificator}_${AdminQueryEvent.exportLogs.name}')
+              .add(_messages.exportLogs,
+                  '${identificator}_${AdminQueryEvent.exportLogs.name}')
               .row()
-              .add(_messages.exit, '${identificator}_${AdminQueryEvent.exit.name}')
+              .add(_messages.exit,
+                  '${identificator}_${AdminQueryEvent.exit.name}')
               .row(),
         );
       case AdminInitial():
@@ -98,7 +104,7 @@ final class AdminScope extends TelegramScope<AdminState> {
   }
 
   @override
-  FutureOr<void> callbackOnQuery(Context<Session> context) async {
+  FutureOr<void> callbackOnQuery(Context context) async {
     if (context.chat?.isForum ?? false) return;
 
     final chatId = context.chat!.id;
@@ -107,8 +113,10 @@ final class AdminScope extends TelegramScope<AdminState> {
     await context.answerCallbackQuery();
 
     final queryData = context.callbackQuery!.data!;
-    final queryEventIdentificator = queryPattern.firstMatch(queryData)!.group(1)!;
-    final queryEvent = AdminQueryEvent.values.firstWhereOrNull((value) => value.name == queryEventIdentificator);
+    final queryEventIdentificator =
+        queryPattern.firstMatch(queryData)!.group(1)!;
+    final queryEvent = AdminQueryEvent.values
+        .firstWhereOrNull((value) => value.name == queryEventIdentificator);
 
     switch (queryEvent) {
       case AdminQueryEvent.exportRating:
@@ -127,7 +135,7 @@ final class AdminScope extends TelegramScope<AdminState> {
     }
   }
 
-  Future<void> _takeCRUDForm(Context<Session> context) async {
+  Future<void> _takeCRUDForm(Context context) async {
     final chatId = context.chat!.id;
     final document = context.message!.document;
 
@@ -167,8 +175,10 @@ final class AdminScope extends TelegramScope<AdminState> {
     if (operations == null) {
       await context.reply(
         _messages.crudFileFormatError,
-        replyMarkup:
-            InlineKeyboard().add(_messages.crudCancel, '${identificator}_${AdminQueryEvent.cancelCRUD.name}').row(),
+        replyMarkup: InlineKeyboard()
+            .add(_messages.crudCancel,
+                '${identificator}_${AdminQueryEvent.cancelCRUD.name}')
+            .row(),
       );
       return;
     }
@@ -232,13 +242,13 @@ final class AdminScope extends TelegramScope<AdminState> {
     return null;
   }
 
-  Future<void> _exit(Context<Session> context) async {
+  Future<void> _exit(Context context) async {
     final chatId = context.chat!.id;
     repository.setState(chatId: chatId, state: const AdminInitial());
     onStateComplete?.call(context);
   }
 
-  Future<void> _cancelCRUD(Context<Session> context) async {
+  Future<void> _cancelCRUD(Context context) async {
     final chatId = context.chat!.id;
 
     repository.setState(chatId: chatId, state: const AdminWork());
@@ -246,12 +256,13 @@ final class AdminScope extends TelegramScope<AdminState> {
     await callbackOnMessage(context);
   }
 
-  Future<void> _requestCRUD(Context<Session> context) async {
+  Future<void> _requestCRUD(Context context) async {
     final chatId = context.chat!.id;
     const jsonEncoder = JsonEncoder.withIndent('  ');
     const utf8Encoder = Utf8Encoder();
 
-    final exampleCrudBytes = utf8Encoder.convert(jsonEncoder.convert(kCrudExample));
+    final exampleCrudBytes =
+        utf8Encoder.convert(jsonEncoder.convert(kCrudExample));
     final emptyCrudBytes = utf8Encoder.convert(jsonEncoder.convert(kCrudEmpty));
 
     await context.reply(
@@ -266,8 +277,10 @@ final class AdminScope extends TelegramScope<AdminState> {
 
     await context.replyWithMediaGroup(
       [
-        InputMediaDocument(media: InputFile.fromBytes(exampleCrudBytes, name: 'example.json')),
-        InputMediaDocument(media: InputFile.fromBytes(emptyCrudBytes, name: 'form.json')),
+        InputMediaDocument(
+            media: InputFile.fromBytes(exampleCrudBytes, name: 'example.json')),
+        InputMediaDocument(
+            media: InputFile.fromBytes(emptyCrudBytes, name: 'form.json')),
       ],
       protectContent: true,
     );
@@ -275,7 +288,7 @@ final class AdminScope extends TelegramScope<AdminState> {
     repository.setState(chatId: chatId, state: const AdminWaitForCRUD());
   }
 
-  Future<void> _exportCategories(Context<Session> context) async {
+  Future<void> _exportCategories(Context context) async {
     final tasksByCategories = await _database.tasksByCategories;
     final json = jsonDecode(jsonEncode(kCrudEmpty)) as Map<String, dynamic>;
 
@@ -284,7 +297,8 @@ final class AdminScope extends TelegramScope<AdminState> {
       // ignore: avoid_dynamic_calls
       json['categories']['operations']['create'].add(categoryJson);
       // ignore: avoid_dynamic_calls
-      json['tasks']['operations']['create'].addAll(tasks.map((t) => t.toJson()));
+      json['tasks']['operations']['create']
+          .addAll(tasks.map((t) => t.toJson()));
     }
 
     const jsonEncoder = JsonEncoder.withIndent('  ');
@@ -303,7 +317,7 @@ final class AdminScope extends TelegramScope<AdminState> {
     );
   }
 
-  Future<void> _exportRating(Context<Session> context) async {
+  Future<void> _exportRating(Context context) async {
     final excel = Excel.createExcel();
 
     await _database.deleteSolvedDuplications();
@@ -315,15 +329,18 @@ final class AdminScope extends TelegramScope<AdminState> {
         TextCellValue('Никнейм'),
         TextCellValue('Задачи'),
       ]);
-    final globalSubmissions =
-        ratingPerCategory.map((categoriesRating) => categoriesRating.usersSubmissions).flattened.toList();
+    final globalSubmissions = ratingPerCategory
+        .map((categoriesRating) => categoriesRating.usersSubmissions)
+        .flattened
+        .toList();
     final groupedSubmissions = _groupSubmissionsByUser(globalSubmissions)
       ..sort(
         (a, b) => b.solvedTasks.length.compareTo(a.solvedTasks.length),
       );
 
     var lastPlaceByCount = (place: 0, count: -1);
-    for (final UserLeetCodeSubmissions(:account, :solvedTasks) in groupedSubmissions) {
+    for (final UserLeetCodeSubmissions(:account, :solvedTasks)
+        in groupedSubmissions) {
       lastPlaceByCount = solvedTasks.length == lastPlaceByCount.count
           ? lastPlaceByCount
           : (place: lastPlaceByCount.place + 1, count: solvedTasks.length);
@@ -335,22 +352,26 @@ final class AdminScope extends TelegramScope<AdminState> {
       ]);
     }
 
-    for (final CategoryRating(:category, :tasks, :usersSubmissions) in ratingPerCategory) {
+    for (final CategoryRating(:category, :tasks, :usersSubmissions)
+        in ratingPerCategory) {
       final sheet = excel[category.shortTitle]
         ..merge(
           CellIndex.indexByString('A1'),
-          CellIndex.indexByColumnRow(columnIndex: tasks.length + 4, rowIndex: 0),
+          CellIndex.indexByColumnRow(
+              columnIndex: tasks.length + 4, rowIndex: 0),
           customValue: TextCellValue(category.title),
         )
         ..updateCell(CellIndex.indexByString('A2'), const TextCellValue('№'))
         ..updateCell(CellIndex.indexByString('B2'), const TextCellValue('Имя'))
         ..updateCell(CellIndex.indexByString('C2'), const TextCellValue('Ник'))
-        ..updateCell(CellIndex.indexByString('D2'), const TextCellValue('Решено'));
+        ..updateCell(
+            CellIndex.indexByString('D2'), const TextCellValue('Решено'));
 
       for (final (index, leetCodeTask) in tasks.indexed) {
         sheet.updateCell(
           CellIndex.indexByColumnRow(columnIndex: index + 4, rowIndex: 1),
-          TextCellValue('${leetCodeTask.complexity.cutName} ${leetCodeTask.title}'),
+          TextCellValue(
+              '${leetCodeTask.complexity.cutName} ${leetCodeTask.title}'),
         );
       }
 
@@ -361,12 +382,14 @@ final class AdminScope extends TelegramScope<AdminState> {
             return leetCodeTask.id == solvedTask.task;
           });
 
-          markers.add(isSolved ? const TextCellValue('+') : const TextCellValue(''));
+          markers.add(
+              isSolved ? const TextCellValue('+') : const TextCellValue(''));
         }
 
         sheet.appendRow([
           TextCellValue('${index + 1}'),
-          TextCellValue(submissions.user.name ?? _messages.exportRatingUnknownUsername),
+          TextCellValue(
+              submissions.user.name ?? _messages.exportRatingUnknownUsername),
           TextCellValue(submissions.account.nickname),
           TextCellValue(submissions.solvedTasks.length.toString()),
           ...markers,
@@ -399,10 +422,12 @@ final class AdminScope extends TelegramScope<AdminState> {
       return;
     }
 
-    await context.replyWithDocument(InputFile.fromFile(logsFile, name: 'logs.logs'));
+    await context
+        .replyWithDocument(InputFile.fromFile(logsFile, name: 'logs.logs'));
   }
 
-  List<UserLeetCodeSubmissions> _groupSubmissionsByUser(List<UserLeetCodeSubmissions> globalSubmissions) {
+  List<UserLeetCodeSubmissions> _groupSubmissionsByUser(
+      List<UserLeetCodeSubmissions> globalSubmissions) {
     final groupedSubmissions = <int, UserLeetCodeSubmissions>{};
     for (final submissions in globalSubmissions) {
       groupedSubmissions.update(
